@@ -1,0 +1,15 @@
+.dashboard {
+  padding: 40px;
+  text-align: center;
+}
+
+.dashboard h1 {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.dashboard p {
+  font-size: 16px;
+  color: #555;
+}
