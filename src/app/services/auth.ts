@@ -27,4 +27,8 @@ register(email: string, password: string) {
   get user() {
     return this.auth.currentUser;
   }
+  // Verificar si el usuario está autenticado
+  isLoggedIn(): boolean {
+    return this.auth.currentUser !== null;
+  }
 }
