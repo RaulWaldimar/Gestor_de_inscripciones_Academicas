@@ -28,7 +28,41 @@ export const adminGuard: CanActivateFn = (route, state) => {
   return authService.currentUser$.pipe(
     take(1),
     map(user => {
-      if (user && user.rol === 'administrador') {
+      if (user && user.rol === 'admin') {
+        return true;
+      } else {
+        router.navigate(['/dashboard']);
+        return false;
+      }
+    })
+  );
+};
+
+export const docenteGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  return authService.currentUser$.pipe(
+    take(1),
+    map(user => {
+      if (user && user.rol === 'docente') {
+        return true;
+      } else {
+        router.navigate(['/dashboard']);
+        return false;
+      }
+    })
+  );
+};
+
+export const estudianteGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  return authService.currentUser$.pipe(
+    take(1),
+    map(user => {
+      if (user && user.rol === 'estudiante') {
         return true;
       } else {
         router.navigate(['/dashboard']);

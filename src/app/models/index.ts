@@ -3,45 +3,61 @@ export interface Usuario {
   email: string;
   nombre: string;
   apellido: string;
-  rol: 'estudiante' | 'administrador';
-  fechaRegistro: Date;
+  rol: 'estudiante' | 'docente' | 'admin';
+  fechaRegistro?: Date;
 }
 
 export interface Estudiante {
-  id: string;
+  id?: string;
+  nombres: string;
+  apellidos: string;
+  nivel: string;
+  grado: string;
+  seccion: string;
+  fechaNacimiento: Date;
+  nombreApoderado: string;
+  telefonoApoderado: string;
+  emailInstitucional: string;
+  estado: 'activo' | 'inactivo' | 'graduado' | 'retirado';
   uid: string;
-  nombre: string;
-  apellido: string;
-  email: string;
-  matricula: string;
-  carrera: string;
-  semestre: number;
-  estado: 'activo' | 'inactivo' | 'graduado';
-  fechaRegistro: Date;
+}
+
+export interface Docente {
+  id?: string;
+  nombres: string;
+  apellidos: string;
+  emailInstitucional: string;
+  telefono: string;
+  nivel: string;
+  gradoAsignado: string[];
+  fechaContratacion: Date;
+  estado: 'activo' | 'inactivo';
+  uid: string;
 }
 
 export interface Curso {
-  id: string;
+  id?: string;
   nombre: string;
-  codigo: string;
   descripcion: string;
-  docente: string;
+  grado: string;
+  seccion: string;
+  nivel: string;
   horario: string;
-  semestre: number;
-  capacidad: number;
-  inscritos: number;
-  estado: 'activo' | 'inactivo';
+  vacantes: number;
+  docenteNombre: string;
+  docenteId: string;
+  aula?: string;
+  anioAcademico: string;
   fechaCreacion: Date;
 }
 
 export interface Matricula {
-  id: string;
+  id?: string;
   estudianteId: string;
   cursoId: string;
-  estado: 'activa' | 'completada' | 'cancelada';
-  calificacion?: number;
+  estado: 'activa' | 'completada' | 'retirada';
   fechaInscripcion: Date;
-  fechaCompletacion?: Date;
+  calificacionFinal: number | null;
 }
 
 export interface EstadisticasAdmin {
@@ -53,3 +69,4 @@ export interface EstadisticasAdmin {
   matriculasActivas: number;
   tasaOcupacion: number;
 }
+

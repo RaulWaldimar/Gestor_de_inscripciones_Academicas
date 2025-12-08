@@ -58,30 +58,18 @@ export class CursoService {
     return this.obtenerCursos().pipe(
       map(cursos => cursos.filter(curso =>
         curso.nombre.toLowerCase().includes(termino.toLowerCase()) ||
-        curso.codigo.toLowerCase().includes(termino.toLowerCase())
+        curso.descripcion.toLowerCase().includes(termino.toLowerCase())
       ))
     );
   }
 
   incrementarInscritos(id: string): Observable<void> {
-    return this.obtenerCursoPorId(id).pipe(
-      switchMap(curso => {
-        if (curso) {
-          return from(updateDoc(doc(this.firestore, 'cursos', id), { inscritos: curso.inscritos + 1 }));
-        }
-        return of(undefined);
-      })
-    );
+    // Ya no es necesario tracking de inscritos manual
+    return of(undefined);
   }
 
   decrementarInscritos(id: string): Observable<void> {
-    return this.obtenerCursoPorId(id).pipe(
-      switchMap(curso => {
-        if (curso && curso.inscritos > 0) {
-          return from(updateDoc(doc(this.firestore, 'cursos', id), { inscritos: curso.inscritos - 1 }));
-        }
-        return of(undefined);
-      })
-    );
+    // Ya no es necesario tracking de inscritos manual
+    return of(undefined);
   }
 }

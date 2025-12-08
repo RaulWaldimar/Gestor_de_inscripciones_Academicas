@@ -1,0 +1,71 @@
+<div class="init-container">
+  <div class="init-card">
+    <div class="init-header">
+      <h1>🎓 Gestor de Inscripciones Académicas</h1>
+      <p>Inicialización de Base de Datos</p>
+    </div>
+
+    <div class="init-content">
+      <div *ngIf="!completed && !loading" class="init-message">
+        <p>Para utilizar la aplicación, es necesario inicializar la base de datos con datos de prueba.</p>
+        <p class="small-text">Se crearán:</p>
+        <ul>
+          <li>✅ 1 usuario Admin</li>
+          <li>✅ 5 docentes</li>
+          <li>✅ 20 estudiantes</li>
+          <li>✅ 5 cursos</li>
+          <li>✅ Matrículas automáticas</li>
+        </ul>
+        <button class="btn btn-primary" (click)="initializeDatabase()" [disabled]="loading">
+          <span *ngIf="!loading">Inicializar Base de Datos</span>
+          <span *ngIf="loading"><span class="spinner"></span> Inicializando...</span>
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner-large"></div>
+        <p>Cargando datos en Firestore...</p>
+        <p class="small-text">Por favor espera, esto puede tomar algunos segundos...</p>
+      </div>
+
+      <div *ngIf="completed" class="success-state">
+        <div class="success-icon">✅</div>
+        <h2>¡Base de Datos Inicializada!</h2>
+        <p>Datos cargados correctamente</p>
+        
+        <div class="credentials">
+          <h3>Credenciales de Acceso:</h3>
+          
+          <div class="credential-box admin">
+            <h4>👤 Admin</h4>
+            <p><strong>Email:</strong> admin@cole.pe</p>
+            <p><strong>Contraseña:</strong> Admin123!</p>
+            <p><strong>Rol:</strong> Administrador</p>
+          </div>
+
+          <div class="credential-box student">
+            <h4>📚 Estudiante (Ejemplo)</h4>
+            <p><strong>Email:</strong> juan.garcía@cole.pe</p>
+            <p><strong>Contraseña:</strong> Estudiante123!</p>
+            <p><strong>Rol:</strong> Estudiante</p>
+          </div>
+
+          <div class="credential-box teacher">
+            <h4>👨‍🏫 Docente (Ejemplo)</h4>
+            <p><strong>Email:</strong> fabric@cole.pe</p>
+            <p><strong>Contraseña:</strong> Docente123!</p>
+            <p><strong>Rol:</strong> Docente</p>
+          </div>
+        </div>
+
+        <a href="/login" class="btn btn-success">Ir a Login</a>
+      </div>
+
+      <div *ngIf="error" class="error-state">
+        <div class="error-icon">⚠️</div>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary" (click)="initializeDatabase()">Reintentar</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -34,12 +34,15 @@ export class EstudiantesComponent implements OnInit {
 
   initForm(): void {
     this.estudianteForm = this.fb.group({
-      nombre: ['', [Validators.required, Validators.minLength(3)]],
-      apellido: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      matricula: ['', [Validators.required, Validators.minLength(4)]],
-      carrera: ['', Validators.required],
-      semestre: ['', [Validators.required, Validators.min(1), Validators.max(10)]],
+      nombres: ['', [Validators.required, Validators.minLength(3)]],
+      apellidos: ['', [Validators.required, Validators.minLength(3)]],
+      emailInstitucional: ['', [Validators.required, Validators.email]],
+      nivel: ['', Validators.required],
+      grado: ['', Validators.required],
+      seccion: ['', Validators.required],
+      fechaNacimiento: ['', Validators.required],
+      nombreApoderado: ['', Validators.required],
+      telefonoApoderado: ['', [Validators.required, Validators.minLength(9)]],
       estado: ['activo', Validators.required]
     });
   }
@@ -77,8 +80,7 @@ export class EstudiantesComponent implements OnInit {
         }
       });
     } else {
-      dataEstudiante.fechaRegistro = new Date();
-      dataEstudiante.uid = ''; // Will be set on auth
+      dataEstudiante.uid = '';
       this.estudianteService.crearEstudiante(dataEstudiante).subscribe({
         next: () => {
           this.cargarEstudiantes();
@@ -93,7 +95,7 @@ export class EstudiantesComponent implements OnInit {
   }
 
   editarEstudiante(estudiante: Estudiante): void {
-    this.editandoId = estudiante.id;
+    this.editandoId = estudiante.id || null;
     this.estudianteForm.patchValue(estudiante);
     this.showForm = true;
   }
@@ -119,10 +121,9 @@ export class EstudiantesComponent implements OnInit {
 
   get estudiantesFiltrados(): Estudiante[] {
     return this.estudiantes.filter(e =>
-      e.nombre.toLowerCase().includes(this.buscador.toLowerCase()) ||
-      e.apellido.toLowerCase().includes(this.buscador.toLowerCase()) ||
-      e.email.toLowerCase().includes(this.buscador.toLowerCase()) ||
-      e.matricula.toLowerCase().includes(this.buscador.toLowerCase())
+      e.nombres.toLowerCase().includes(this.buscador.toLowerCase()) ||
+      e.apellidos.toLowerCase().includes(this.buscador.toLowerCase()) ||
+      e.emailInstitucional.toLowerCase().includes(this.buscador.toLowerCase())
     );
   }
 }

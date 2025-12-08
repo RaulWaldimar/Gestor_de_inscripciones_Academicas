@@ -98,7 +98,7 @@ export class MatriculasComponent implements OnInit {
 
   cancelarMatricula(id: string): void {
     if (confirm('¿Estás seguro de que deseas cancelar esta matrícula?')) {
-      this.matriculaService.actualizarMatricula(id, { estado: 'cancelada' }).subscribe({
+      this.matriculaService.actualizarMatricula(id, { estado: 'retirada' }).subscribe({
         next: () => {
           this.cargarDatos();
         },
@@ -116,7 +116,7 @@ export class MatriculasComponent implements OnInit {
 
   obtenerNombreEstudiante(estudianteId: string): string {
     const est = this.estudiantes.find(e => e.id === estudianteId);
-    return est ? `${est.nombre} ${est.apellido}` : 'Estudiante no encontrado';
+    return est ? `${est.nombres} ${est.apellidos}` : 'Estudiante no encontrado';
   }
 
   obtenerNombreCurso(cursoId: string): string {

@@ -29,13 +29,6 @@
           </span>
         </div>
         <div class="form-group">
-          <label>Código *</label>
-          <input type="text" formControlName="codigo" placeholder="Código del curso">
-          <span *ngIf="cursoForm.get('codigo')?.invalid && cursoForm.get('codigo')?.touched" class="error">
-            El código es requerido (mínimo 2 caracteres)
-          </span>
-        </div>
-        <div class="form-group">
           <label>Descripción *</label>
           <textarea formControlName="descripcion" placeholder="Descripción del curso"></textarea>
           <span *ngIf="cursoForm.get('descripcion')?.invalid && cursoForm.get('descripcion')?.touched" class="error">
@@ -43,39 +36,67 @@
           </span>
         </div>
         <div class="form-group">
-          <label>Docente *</label>
-          <input type="text" formControlName="docente" placeholder="Nombre del docente">
-          <span *ngIf="cursoForm.get('docente')?.invalid && cursoForm.get('docente')?.touched" class="error">
-            El docente es requerido
+          <label>Grado *</label>
+          <input type="text" formControlName="grado" placeholder="Ej: 1ro, 2do, 3ro">
+          <span *ngIf="cursoForm.get('grado')?.invalid && cursoForm.get('grado')?.touched" class="error">
+            El grado es requerido
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Sección *</label>
+          <input type="text" formControlName="seccion" placeholder="Ej: A, B, C">
+          <span *ngIf="cursoForm.get('seccion')?.invalid && cursoForm.get('seccion')?.touched" class="error">
+            La sección es requerida
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Nivel *</label>
+          <input type="text" formControlName="nivel" placeholder="Ej: Primaria, Secundaria">
+          <span *ngIf="cursoForm.get('nivel')?.invalid && cursoForm.get('nivel')?.touched" class="error">
+            El nivel es requerido
           </span>
         </div>
         <div class="form-group">
           <label>Horario *</label>
-          <input type="text" formControlName="horario" placeholder="Ej: Lunes-Miércoles 10:00-12:00">
+          <input type="text" formControlName="horario" placeholder="Ej: Lunes-Viernes 9:00-10:00">
           <span *ngIf="cursoForm.get('horario')?.invalid && cursoForm.get('horario')?.touched" class="error">
             El horario es requerido
           </span>
         </div>
         <div class="form-group">
-          <label>Semestre *</label>
-          <input type="number" formControlName="semestre" placeholder="Número de semestre" min="1">
-          <span *ngIf="cursoForm.get('semestre')?.invalid && cursoForm.get('semestre')?.touched" class="error">
-            El semestre es requerido (mínimo 1)
+          <label>Vacantes *</label>
+          <input type="number" formControlName="vacantes" placeholder="Número de vacantes" min="1">
+          <span *ngIf="cursoForm.get('vacantes')?.invalid && cursoForm.get('vacantes')?.touched" class="error">
+            Las vacantes son requeridas (mínimo 1)
           </span>
         </div>
         <div class="form-group">
-          <label>Capacidad *</label>
-          <input type="number" formControlName="capacidad" placeholder="Número máximo de estudiantes" min="1">
-          <span *ngIf="cursoForm.get('capacidad')?.invalid && cursoForm.get('capacidad')?.touched" class="error">
-            La capacidad es requerida (mínimo 1)
+          <label>Docente *</label>
+          <input type="text" formControlName="docenteNombre" placeholder="Nombre del docente">
+          <span *ngIf="cursoForm.get('docenteNombre')?.invalid && cursoForm.get('docenteNombre')?.touched" class="error">
+            El docente es requerido
           </span>
         </div>
         <div class="form-group">
-          <label>Estado *</label>
-          <select formControlName="estado">
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
+          <label>ID Docente *</label>
+          <input type="text" formControlName="docenteId" placeholder="ID del docente en base de datos">
+          <span *ngIf="cursoForm.get('docenteId')?.invalid && cursoForm.get('docenteId')?.touched" class="error">
+            El ID del docente es requerido
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Aula *</label>
+          <input type="text" formControlName="aula" placeholder="Ej: 101, 202, A-3">
+          <span *ngIf="cursoForm.get('aula')?.invalid && cursoForm.get('aula')?.touched" class="error">
+            El aula es requerida
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Año Académico *</label>
+          <input type="number" formControlName="anioAcademico" placeholder="Año académico" min="2020">
+          <span *ngIf="cursoForm.get('anioAcademico')?.invalid && cursoForm.get('anioAcademico')?.touched" class="error">
+            El año académico es requerido
+          </span>
         </div>
         <div class="form-actions">
           <button type="submit" class="btn btn-success" [disabled]="cursoForm.invalid">
@@ -95,7 +116,7 @@
       <input
         type="text"
         class="search-input"
-        placeholder="Buscar por nombre o código..."
+        placeholder="Buscar por nombre o grado..."
         [(ngModel)]="buscador"
       />
     </div>
@@ -108,31 +129,27 @@
       <thead>
         <tr>
           <th>Nombre</th>
-          <th>Código</th>
+          <th>Grado</th>
+          <th>Sección</th>
           <th>Docente</th>
           <th>Horario</th>
-          <th>Semestre</th>
-          <th>Inscritos/Capacidad</th>
-          <th>Estado</th>
+          <th>Vacantes</th>
+          <th>Aula</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let curso of cursosFiltrados">
           <td>{{ curso.nombre }}</td>
-          <td>{{ curso.codigo }}</td>
-          <td>{{ curso.docente }}</td>
+          <td>{{ curso.grado }}</td>
+          <td>{{ curso.seccion }}</td>
+          <td>{{ curso.docenteNombre }}</td>
           <td>{{ curso.horario }}</td>
-          <td>{{ curso.semestre }}</td>
-          <td>{{ curso.inscritos }}/{{ curso.capacidad }}</td>
-          <td>
-            <span class="estado-badge" [ngClass]="'estado-' + curso.estado">
-              {{ curso.estado | estadoCurso }}
-            </span>
-          </td>
+          <td>{{ curso.vacantes }}</td>
+          <td>{{ curso.aula }}</td>
           <td class="acciones">
             <button class="btn btn-sm btn-edit" (click)="editarCurso(curso)">Editar</button>
-            <button class="btn btn-sm btn-delete" (click)="eliminarCurso(curso.id)">Eliminar</button>
+            <button class="btn btn-sm btn-delete" (click)="eliminarCurso(curso.id!)">Eliminar</button>
           </td>
         </tr>
       </tbody>

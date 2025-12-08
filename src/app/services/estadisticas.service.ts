@@ -24,9 +24,9 @@ export class EstadisticasService {
     ]).pipe(
       map(([estudiantes, cursos, matriculas]) => {
         const estudiantesActivos = estudiantes.filter(e => e.estado === 'activo').length;
-        const cursosActivos = cursos.filter(c => c.estado === 'activo').length;
+        const cursosActivos = cursos.length; // Todos los cursos creados se consideran activos
         const matriculasActivas = matriculas.filter(m => m.estado === 'activa').length;
-        const capacidadTotal = cursos.reduce((acc, c) => acc + c.capacidad, 0);
+        const capacidadTotal = cursos.reduce((acc, c) => acc + c.vacantes, 0);
 
         return {
           totalEstudiantes: estudiantes.length,

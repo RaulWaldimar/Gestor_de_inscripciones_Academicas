@@ -12,21 +12,36 @@
     </button>
 
     <ul class="nav-links" [class.active]="menuAbierto">
-      <li><a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">Dashboard</a></li>
-      <li *ngIf="currentUser.rol === 'administrador'">
+      <!-- Enlaces para estudiantes -->
+      <li *ngIf="currentUser.rol === 'estudiante'">
+        <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMenu()">Mi Información</a>
+      </li>
+      
+      <!-- Enlaces para docentes -->
+      <li *ngIf="currentUser.rol === 'docente'">
+        <a routerLink="/docente" routerLinkActive="active" (click)="closeMenu()">Mis Cursos</a>
+      </li>
+      
+      <!-- Enlaces para admin -->
+      <li *ngIf="currentUser.rol === 'admin'">
+        <a routerLink="/admin-dashboard" routerLinkActive="active" (click)="closeMenu()">Panel General</a>
+      </li>
+      <li *ngIf="currentUser.rol === 'admin'">
         <a routerLink="/admin/cursos" routerLinkActive="active" (click)="closeMenu()">Cursos</a>
       </li>
-      <li *ngIf="currentUser.rol === 'administrador'">
+      <li *ngIf="currentUser.rol === 'admin'">
         <a routerLink="/admin/estudiantes" routerLinkActive="active" (click)="closeMenu()">Estudiantes</a>
       </li>
-      <li *ngIf="currentUser.rol === 'administrador'">
+      <li *ngIf="currentUser.rol === 'admin'">
         <a routerLink="/admin/matriculas" routerLinkActive="active" (click)="closeMenu()">Matrículas</a>
       </li>
-      <li *ngIf="currentUser.rol === 'administrador'">
+      <li *ngIf="currentUser.rol === 'admin'">
         <a routerLink="/admin/estadisticas" routerLinkActive="active" (click)="closeMenu()">Estadísticas</a>
       </li>
+      
+      <!-- Usuario y logout -->
       <li class="nav-user">
-        <span>{{ currentUser.nombre }} {{ currentUser.apellido }}</span>
+        <span>{{ currentUser.nombre }} {{ currentUser.apellido }} ({{ currentUser.rol | titlecase }})</span>
         <button class="btn btn-logout" (click)="logout()">Logout</button>
       </li>
     </ul>

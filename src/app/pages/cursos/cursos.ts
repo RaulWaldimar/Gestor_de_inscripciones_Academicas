@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CursoService } from '../../services/curso.service';
 import { Curso } from '../../models';
-import { EstadoCursoPipe } from '../../pipes/custom.pipes';
 
 @Component({
   selector: 'app-cursos',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, EstadoCursoPipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './cursos.html',
   styleUrls: ['./cursos.css']
 })
@@ -35,13 +34,16 @@ export class CursosComponent implements OnInit {
   initForm(): void {
     this.cursoForm = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
-      codigo: ['', [Validators.required, Validators.minLength(2)]],
       descripcion: ['', Validators.required],
-      docente: ['', Validators.required],
+      grado: ['', Validators.required],
+      seccion: ['', Validators.required],
+      nivel: ['', Validators.required],
       horario: ['', Validators.required],
-      semestre: ['', [Validators.required, Validators.min(1)]],
-      capacidad: ['', [Validators.required, Validators.min(1)]],
-      estado: ['activo', Validators.required]
+      vacantes: ['', [Validators.required, Validators.min(1)]],
+      docenteNombre: ['', Validators.required],
+      docenteId: ['', Validators.required],
+      aula: ['', Validators.required],
+      anioAcademico: [new Date().getFullYear(), Validators.required]
     });
   }
 
@@ -79,7 +81,6 @@ export class CursosComponent implements OnInit {
       });
     } else {
       dataCurso.fechaCreacion = new Date();
-      dataCurso.inscritos = 0;
       this.cursoService.crearCurso(dataCurso).subscribe({
         next: () => {
           this.cargarCursos();
@@ -94,7 +95,7 @@ export class CursosComponent implements OnInit {
   }
 
   editarCurso(curso: Curso): void {
-    this.editandoId = curso.id;
+    this.editandoId = curso.id || null;
     this.cursoForm.patchValue(curso);
     this.showForm = true;
   }
@@ -121,7 +122,7 @@ export class CursosComponent implements OnInit {
   get cursosFiltrados(): Curso[] {
     return this.cursos.filter(c =>
       c.nombre.toLowerCase().includes(this.buscador.toLowerCase()) ||
-      c.codigo.toLowerCase().includes(this.buscador.toLowerCase())
+      c.grado.toLowerCase().includes(this.buscador.toLowerCase())
     );
   }
 }

@@ -69,10 +69,9 @@ export class EstudianteService {
   buscarEstudiantes(termino: string): Observable<Estudiante[]> {
     return this.obtenerEstudiantes().pipe(
       map(estudiantes => estudiantes.filter(est =>
-        est.nombre.toLowerCase().includes(termino.toLowerCase()) ||
-        est.apellido.toLowerCase().includes(termino.toLowerCase()) ||
-        est.email.toLowerCase().includes(termino.toLowerCase()) ||
-        est.matricula.toLowerCase().includes(termino.toLowerCase())
+        est.nombres.toLowerCase().includes(termino.toLowerCase()) ||
+        est.apellidos.toLowerCase().includes(termino.toLowerCase()) ||
+        est.emailInstitucional.toLowerCase().includes(termino.toLowerCase())
       ))
     );
   }

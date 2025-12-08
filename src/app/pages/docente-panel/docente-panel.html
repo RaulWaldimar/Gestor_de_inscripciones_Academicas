@@ -1,0 +1,122 @@
+<div class="docente-panel-container">
+  <div class="panel-header">
+    <h1>Panel de Docente</h1>
+    <p *ngIf="usuario">Bienvenido, {{ usuario.nombre }} {{ usuario.apellido }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando información...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Sección de Cursos -->
+    <div class="cursos-section">
+      <h2>Mis Cursos</h2>
+      <div *ngIf="cursos.length === 0" class="empty-state">
+        <p>No tienes cursos asignados</p>
+      </div>
+      
+      <div *ngIf="cursos.length > 0" class="curso-selector">
+        <select [(ngModel)]="selectedCursoId" (change)="onCursoChange()" class="select-course">
+          <option value="">-- Seleccionar curso --</option>
+          <option *ngFor="let curso of cursos" [value]="curso.id">
+            {{ curso.nombre }} - Grado {{ curso.grado }} Sección {{ curso.seccion }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Información del Curso Seleccionado -->
+      <div *ngIf="cursoSeleccionado" class="curso-info-card">
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Curso:</label>
+            <p>{{ cursoSeleccionado.nombre }}</p>
+          </div>
+          <div class="info-item">
+            <label>Nivel:</label>
+            <p>{{ cursoSeleccionado.nivel }}</p>
+          </div>
+          <div class="info-item">
+            <label>Grado:</label>
+            <p>{{ cursoSeleccionado.grado }}</p>
+          </div>
+          <div class="info-item">
+            <label>Sección:</label>
+            <p>{{ cursoSeleccionado.seccion }}</p>
+          </div>
+          <div class="info-item">
+            <label>Horario:</label>
+            <p>{{ cursoSeleccionado.horario }}</p>
+          </div>
+          <div class="info-item">
+            <label>Aula:</label>
+            <p>{{ cursoSeleccionado.aula }}</p>
+          </div>
+          <div class="info-item">
+            <label>Vacantes Disponibles:</label>
+            <p>{{ cursoSeleccionado.vacantes }}</p>
+          </div>
+          <div class="info-item">
+            <label>Año Académico:</label>
+            <p>{{ cursoSeleccionado.anioAcademico }}</p>
+          </div>
+        </div>
+        <p class="curso-descripcion">{{ cursoSeleccionado.descripcion }}</p>
+      </div>
+    </div>
+
+    <!-- Sección de Estudiantes Matriculados -->
+    <div *ngIf="selectedCursoId" class="estudiantes-section">
+      <h2>Estudiantes Matriculados en {{ cursoSeleccionado?.nombre }}</h2>
+      
+      <div *ngIf="matriculas.length === 0" class="empty-state">
+        <p>No hay estudiantes matriculados en este curso</p>
+      </div>
+
+      <div *ngIf="matriculas.length > 0">
+        <div class="search-bar">
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar estudiante..."
+            [(ngModel)]="buscador"
+          />
+        </div>
+
+        <div *ngIf="matriculasFiltradas.length === 0" class="empty-state">
+          <p>No se encontraron resultados</p>
+        </div>
+
+        <table *ngIf="matriculasFiltradas.length > 0" class="estudiantes-table">
+          <thead>
+            <tr>
+              <th>Estudiante</th>
+              <th>Estado Matrícula</th>
+              <th>Fecha Inscripción</th>
+              <th>Calificación</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let matricula of matriculasFiltradas">
+              <td>{{ obtenerNombreEstudiante(matricula.estudianteId) }}</td>
+              <td>
+                <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
+                  {{ matricula.estado | estadoMatricula }}
+                </span>
+              </td>
+              <td>{{ matricula.fechaInscripcion | date: 'short' }}</td>
+              <td>{{ matricula.calificacionFinal || 'Sin calificar' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

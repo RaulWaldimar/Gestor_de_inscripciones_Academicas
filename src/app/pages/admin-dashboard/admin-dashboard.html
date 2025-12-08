@@ -1,0 +1,72 @@
+<div class="admin-dashboard-container">
+  <div class="dashboard-header">
+    <h1>Panel de Administración</h1>
+    <p *ngIf="usuario">Bienvenido, {{ usuario.nombre }} {{ usuario.apellido }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando estadísticas...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Estadísticas Principales -->
+  <div *ngIf="!loading && !error" class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ totalEstudiantes }}</div>
+      <div class="stat-label">Estudiantes</div>
+      <a routerLink="/admin/estudiantes" class="stat-link">Ver detalles →</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-number">{{ totalDocentes }}</div>
+      <div class="stat-label">Docentes</div>
+      <a routerLink="/admin/docentes" class="stat-link">Ver detalles →</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-number">{{ totalCursos }}</div>
+      <div class="stat-label">Cursos</div>
+      <a routerLink="/admin/cursos" class="stat-link">Ver detalles →</a>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-number">{{ totalMatriculas }}</div>
+      <div class="stat-label">Matrículas Totales</div>
+      <a routerLink="/admin/matriculas" class="stat-link">Ver detalles →</a>
+    </div>
+
+    <div class="stat-card highlight">
+      <div class="stat-number">{{ matriculasActivas }}</div>
+      <div class="stat-label">Matrículas Activas</div>
+      <a routerLink="/admin/matriculas" class="stat-link">Ver detalles →</a>
+    </div>
+  </div>
+
+  <!-- Opciones Rápidas -->
+  <div *ngIf="!loading && !error" class="quick-actions">
+    <h2>Gestión Rápida</h2>
+    <div class="action-buttons">
+      <a routerLink="/admin/cursos" class="action-button">
+        <span class="action-icon">📚</span>
+        <span class="action-text">Gestionar Cursos</span>
+      </a>
+      <a routerLink="/admin/estudiantes" class="action-button">
+        <span class="action-icon">👥</span>
+        <span class="action-text">Gestionar Estudiantes</span>
+      </a>
+      <a routerLink="/admin/matriculas" class="action-button">
+        <span class="action-icon">📋</span>
+        <span class="action-text">Gestionar Matrículas</span>
+      </a>
+      <a routerLink="/admin/estadisticas" class="action-button">
+        <span class="action-icon">📊</span>
+        <span class="action-text">Ver Estadísticas</span>
+      </a>
+    </div>
+  </div>
+</div>

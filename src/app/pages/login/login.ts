@@ -53,7 +53,14 @@ export class LoginComponent implements OnInit {
     this.authService.login(email, password).subscribe({
       next: (user) => {
         if (user) {
-          this.router.navigate(['/dashboard']);
+          // Redirigir según el rol
+          if (user.rol === 'admin') {
+            this.router.navigate(['/admin-dashboard']);
+          } else if (user.rol === 'docente') {
+            this.router.navigate(['/docente']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         } else {
           this.error = 'Credenciales inválidas';
         }
@@ -75,7 +82,14 @@ export class LoginComponent implements OnInit {
     const { email, password, nombre, apellido, rol } = this.registerForm.value;
     this.authService.register(email, password, nombre, apellido, rol).subscribe({
       next: (user) => {
-        this.router.navigate(['/dashboard']);
+        // Redirigir según el rol
+        if (user.rol === 'admin') {
+          this.router.navigate(['/admin-dashboard']);
+        } else if (user.rol === 'docente') {
+          this.router.navigate(['/docente']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
         this.loading = false;
       },
       error: (err) => {

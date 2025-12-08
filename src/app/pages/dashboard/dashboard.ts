@@ -43,7 +43,9 @@ export class DashboardComponent implements OnInit {
       next: (est) => {
         if (est) {
           this.estudiante = est;
-          this.cargarMatriculas(est.id);
+          if (est.id) {
+            this.cargarMatriculas(est.id);
+          }
         } else {
           this.error = 'No se encontraron datos del estudiante';
           this.loading = false;
@@ -89,7 +91,7 @@ export class DashboardComponent implements OnInit {
 
   obtenerDocente(cursoId: string): string {
     const curso = this.cursos.find(c => c.id === cursoId);
-    return curso ? curso.docente : 'N/A';
+    return curso ? curso.docenteNombre : 'N/A';
   }
 
   obtenerHorario(cursoId: string): string {

@@ -1,7 +1,7 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h1>Mi Dashboard</h1>
-    <p *ngIf="estudiante">Bienvenido, {{ estudiante.nombre }} {{ estudiante.apellido }}</p>
+    <p *ngIf="estudiante">Bienvenido, {{ estudiante.nombres }} {{ estudiante.apellidos }}</p>
   </div>
 
   <!-- Loading -->
@@ -21,20 +21,24 @@
       <h2>Información del Estudiante</h2>
       <div class="info-grid" *ngIf="estudiante">
         <div class="info-item">
-          <label>Email:</label>
-          <p>{{ estudiante.email }}</p>
+          <label>Email Institucional:</label>
+          <p>{{ estudiante.emailInstitucional }}</p>
         </div>
         <div class="info-item">
-          <label>Matrícula:</label>
-          <p>{{ estudiante.matricula }}</p>
+          <label>Nivel:</label>
+          <p>{{ estudiante.nivel }}</p>
         </div>
         <div class="info-item">
-          <label>Carrera:</label>
-          <p>{{ estudiante.carrera }}</p>
+          <label>Grado:</label>
+          <p>{{ estudiante.grado }}</p>
         </div>
         <div class="info-item">
-          <label>Semestre:</label>
-          <p>{{ estudiante.semestre }}</p>
+          <label>Sección:</label>
+          <p>{{ estudiante.seccion }}</p>
+        </div>
+        <div class="info-item">
+          <label>Apoderado:</label>
+          <p>{{ estudiante.nombreApoderado }}</p>
         </div>
         <div class="info-item">
           <label>Estado:</label>
@@ -71,7 +75,7 @@
             <p><strong>Docente:</strong> {{ obtenerDocente(matricula.cursoId) }}</p>
             <p><strong>Horario:</strong> {{ obtenerHorario(matricula.cursoId) }}</p>
             <p><strong>Fecha de Inscripción:</strong> {{ matricula.fechaInscripcion | date: 'short' }}</p>
-            <p *ngIf="matricula.calificacion"><strong>Calificación:</strong> {{ matricula.calificacion }}</p>
+            <p *ngIf="matricula.calificacionFinal"><strong>Calificación:</strong> {{ matricula.calificacionFinal }}</p>
           </div>
         </div>
       </div>

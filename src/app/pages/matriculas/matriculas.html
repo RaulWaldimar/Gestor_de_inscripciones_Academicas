@@ -25,8 +25,8 @@
           <label>Estudiante *</label>
           <select formControlName="estudianteId">
             <option value="">-- Seleccionar estudiante --</option>
-            <option *ngFor="let est of estudiantes" [value]="est.id">
-              {{ est.nombre }} {{ est.apellido }} ({{ est.matricula }})
+            <option *ngFor="let est of estudiantes" [value]="est.id!">
+              {{ est.nombres }} {{ est.apellidos }}
             </option>
           </select>
           <span *ngIf="matriculaForm.get('estudianteId')?.invalid && matriculaForm.get('estudianteId')?.touched" class="error">
@@ -38,7 +38,7 @@
           <select formControlName="cursoId">
             <option value="">-- Seleccionar curso --</option>
             <option *ngFor="let curso of cursos" [value]="curso.id">
-              {{ curso.nombre }} ({{ curso.codigo }}) - Sem {{ curso.semestre }}
+              {{ curso.nombre }} - Grado {{ curso.grado }} Sec {{ curso.seccion }}
             </option>
           </select>
           <span *ngIf="matriculaForm.get('cursoId')?.invalid && matriculaForm.get('cursoId')?.touched" class="error">
@@ -50,7 +50,7 @@
           <select formControlName="estado">
             <option value="activa">Activa</option>
             <option value="completada">Completada</option>
-            <option value="cancelada">Cancelada</option>
+            <option value="retirada">Retirada</option>
           </select>
         </div>
         <div class="form-actions">
@@ -107,12 +107,12 @@
               {{ matricula.estado | estadoMatricula }}
             </span>
           </td>
-          <td>{{ matricula.calificacion || 'Sin calificar' }}</td>
+          <td>{{ matricula.calificacionFinal || 'Sin calificar' }}</td>
           <td class="acciones">
             <button 
-              *ngIf="matricula.estado === 'activa'"
+              *ngIf="matricula.estado === 'activa' && matricula.id"
               class="btn btn-sm btn-delete" 
-              (click)="cancelarMatricula(matricula.id)">
+              (click)="cancelarMatricula(matricula.id!)">
               Cancelar
             </button>
             <span *ngIf="matricula.estado !== 'activa'" class="text-muted">-</span>

@@ -29,7 +29,7 @@ export class AuthService {
     });
   }
 
-  register(email: string, password: string, nombre: string, apellido: string, rol: 'estudiante' | 'administrador'): Observable<Usuario> {
+  register(email: string, password: string, nombre: string, apellido: string, rol: 'estudiante' | 'docente' | 'admin'): Observable<Usuario> {
     return from(
       createUserWithEmailAndPassword(this.auth, email, password)
     ).pipe(
@@ -39,8 +39,7 @@ export class AuthService {
           email,
           nombre,
           apellido,
-          rol,
-          fechaRegistro: new Date()
+          rol
         };
         return from(setDoc(doc(this.firestore, 'usuarios', user.uid), userData)).pipe(
           map(() => userData),
@@ -83,7 +82,7 @@ export class AuthService {
     return this.currentUser$.pipe(map(user => !!user));
   }
 
-  getUserRole(): 'estudiante' | 'administrador' | null {
+  getUserRole(): 'estudiante' | 'docente' | 'admin' | null {
     return this.currentUserSubject.value?.rol || null;
   }
 }
