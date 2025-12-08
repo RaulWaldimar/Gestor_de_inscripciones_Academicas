@@ -86,15 +86,18 @@ export class CleanupService {
     const matriculasCollection = collection(this.firestore, 'matriculas');
     const matriculasSnap = await getDocs(matriculasCollection);
     const estudiantesActuales = new Set(
-      (await getDocs(collection(this.firestore, 'estudiantes'))).docs.map(d => d.data()['uid'])
+      (await getDocs(collection(this.firestore, 'estudiantes'))).docs.map(d => d.id)
+    );
+    const cursosActuales = new Set(
+      (await getDocs(collection(this.firestore, 'cursos'))).docs.map(d => d.id)
     );
 
     for (const docSnap of matriculasSnap.docs) {
       const matData = docSnap.data() as any;
-      if (!estudiantesActuales.has(matData.estudianteId)) {
+      if (!estudiantesActuales.has(matData.estudianteId) || !cursosActuales.has(matData.cursoId)) {
         try {
           await deleteDoc(docSnap.ref);
-          console.log(`✅ Matrícula huérfana eliminada`);
+          console.log(`✅ Matrícula huérfana eliminada (Est: ${matData.estudianteId}, Curso: ${matData.cursoId})`);
           eliminados++;
         } catch (error) {
           console.error(`❌ Error eliminando matrícula huérfana:`, error);

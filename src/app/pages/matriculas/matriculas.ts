@@ -6,6 +6,7 @@ import { EstudianteService } from '../../services/estudiante.service';
 import { CursoService } from '../../services/curso.service';
 import { Matricula, Estudiante, Curso } from '../../models';
 import { EstadoMatriculaPipe } from '../../pipes/custom.pipes';
+import { SafeDatePipe } from '../../pipes/timestamp.pipe';
 import { forkJoin } from 'rxjs';
 
 interface MatriculaConDatos extends Matricula {
@@ -16,7 +17,7 @@ interface MatriculaConDatos extends Matricula {
 @Component({
   selector: 'app-matriculas',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, EstadoMatriculaPipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, EstadoMatriculaPipe, SafeDatePipe],
   templateUrl: './matriculas.html',
   styleUrls: ['./matriculas.css']
 })
