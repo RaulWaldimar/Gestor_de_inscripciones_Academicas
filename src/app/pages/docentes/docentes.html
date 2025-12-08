@@ -1,0 +1,131 @@
+<div class="docentes-container">
+  <div class="header">
+    <h1>Gestión de Docentes</h1>
+    <button *ngIf="!showForm" class="btn btn-primary" (click)="showForm = true">
+      + Nuevo Docente
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando docentes...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="showForm" class="form-modal">
+    <div class="form-card">
+      <h2>{{ editandoId ? 'Editar Docente' : 'Nuevo Docente' }}</h2>
+      <form [formGroup]="docenteForm" (ngSubmit)="guardarDocente()">
+        <div class="form-group">
+          <label>Nombres *</label>
+          <input type="text" formControlName="nombres" placeholder="Juan">
+          <span *ngIf="docenteForm.get('nombres')?.invalid && docenteForm.get('nombres')?.touched" class="error">
+            Nombre requerido (mínimo 3 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Apellidos *</label>
+          <input type="text" formControlName="apellidos" placeholder="García">
+          <span *ngIf="docenteForm.get('apellidos')?.invalid && docenteForm.get('apellidos')?.touched" class="error">
+            Apellido requerido (mínimo 3 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Email Institucional *</label>
+          <input type="email" formControlName="emailInstitucional" placeholder="juan.garcia@cole.pe">
+          <span *ngIf="docenteForm.get('emailInstitucional')?.invalid && docenteForm.get('emailInstitucional')?.touched" class="error">
+            Email válido requerido
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Teléfono *</label>
+          <input type="text" formControlName="telefono" placeholder="987654321">
+          <span *ngIf="docenteForm.get('telefono')?.invalid && docenteForm.get('telefono')?.touched" class="error">
+            Teléfono requerido (mínimo 9 dígitos)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Nivel *</label>
+          <select formControlName="nivel">
+            <option value="">-- Seleccionar nivel --</option>
+            <option value="Primaria">Primaria</option>
+            <option value="Secundaria">Secundaria</option>
+          </select>
+          <span *ngIf="docenteForm.get('nivel')?.invalid && docenteForm.get('nivel')?.touched" class="error">
+            Debe seleccionar un nivel
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Estado *</label>
+          <select formControlName="estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="docenteForm.invalid">
+            {{ editandoId ? 'Actualizar Docente' : 'Crear Docente' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de Docentes -->
+  <div *ngIf="!showForm && !loading && !error" class="docentes-section">
+    <div class="filters">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por nombre o email..."
+        [(ngModel)]="buscador"
+      />
+    </div>
+
+    <div *ngIf="docentesFiltrados.length === 0" class="empty-state">
+      <p>No hay docentes disponibles</p>
+    </div>
+
+    <table *ngIf="docentesFiltrados.length > 0" class="docentes-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Nivel</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let docente of docentesFiltrados">
+          <td>{{ docente.nombres }} {{ docente.apellidos }}</td>
+          <td>{{ docente.emailInstitucional }}</td>
+          <td>{{ docente.telefono }}</td>
+          <td>{{ docente.nivel }}</td>
+          <td>
+            <span class="estado-badge" [ngClass]="'estado-' + docente.estado">
+              {{ docente.estado | titlecase }}
+            </span>
+          </td>
+          <td class="acciones">
+            <button class="btn btn-sm btn-edit" (click)="editarDocente(docente)">
+              Editar
+            </button>
+            <button *ngIf="docente.id" class="btn btn-sm btn-delete" (click)="eliminarDocente(docente.id)">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

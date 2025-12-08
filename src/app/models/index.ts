@@ -55,7 +55,7 @@ export interface Matricula {
   id?: string;
   estudianteId: string;
   cursoId: string;
-  estado: 'activa' | 'completada' | 'retirada';
+  estado: 'activa' | 'completada' | 'retirada' | 'cancelada';
   fechaInscripcion: Date;
   calificacionFinal: number | null;
 }

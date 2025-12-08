@@ -1,4 +1,4 @@
-.matriculas-container {
+.docentes-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
@@ -128,24 +128,8 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.filter-select {
-  padding: 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 6px;
-  font-size: 1rem;
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.3s;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
 /* Table Styling */
-.matriculas-section {
+.docentes-section {
   animation: fadeIn 0.3s ease;
 }
 
@@ -165,7 +149,7 @@
   font-size: 1.1rem;
 }
 
-.matriculas-table {
+.docentes-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
@@ -174,23 +158,23 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.matriculas-table thead {
+.docentes-table thead {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.matriculas-table th {
+.docentes-table th {
   padding: 15px;
   text-align: left;
   font-weight: 600;
 }
 
-.matriculas-table td {
+.docentes-table td {
   padding: 12px 15px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.matriculas-table tbody tr:hover {
+.docentes-table tbody tr:hover {
   background: #f9f9f9;
 }
 
@@ -203,32 +187,18 @@
   text-transform: uppercase;
 }
 
-.estado-activa {
+.estado-activo {
   background: #d4edda;
   color: #155724;
 }
 
-.estado-completada {
-  background: #d1ecf1;
-  color: #0c5460;
-}
-
-.estado-cancelada {
+.estado-inactivo {
   background: #f8d7da;
   color: #721c24;
 }
 
-.estado-retirada {
-  background: #fff3cd;
-  color: #856404;
-}
-
 .acciones {
   text-align: center;
-}
-
-.text-muted {
-  color: #999;
 }
 
 .btn {
@@ -261,6 +231,13 @@
 .btn-secondary {
   background: #6c757d;
   color: white;
+}
+
+.btn-edit {
+  background: #007bff;
+  color: white;
+  padding: 6px 12px;
+  font-size: 0.75rem;
 }
 
 .btn-delete {
@@ -338,21 +315,17 @@
     min-width: 100%;
   }
 
-  .filter-select {
-    width: 100%;
-  }
-
   .form-card {
     width: 95%;
     padding: 20px;
   }
 
-  .matriculas-table {
+  .docentes-table {
     font-size: 0.875rem;
   }
 
-  .matriculas-table th,
-  .matriculas-table td {
+  .docentes-table th,
+  .docentes-table td {
     padding: 10px;
   }
 

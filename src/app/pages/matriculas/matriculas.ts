@@ -142,7 +142,7 @@ export class MatriculasComponent implements OnInit {
 
   cancelarMatricula(id: string): void {
     if (confirm('¿Estás seguro de que deseas cancelar esta matrícula?')) {
-      this.matriculaService.actualizarMatricula(id, { estado: 'retirada' }).subscribe({
+      this.matriculaService.actualizarMatricula(id, { estado: 'cancelada' }).subscribe({
         next: () => {
           this.cargarDatos();
         },

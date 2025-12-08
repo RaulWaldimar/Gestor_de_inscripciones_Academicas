@@ -188,13 +188,13 @@ export class SeedDataService {
 
     // Crear estudiantes
     const estudiantesData = this.generateEstudiantes(20);
-    const estudiantesUIDs: string[] = [];
+    const estudiantesIds: string[] = []; // IDs de documentos, no UIDs
+    const estudiantesUIDMap: Map<string, string> = new Map(); // Mapeo de UID a Doc ID
 
     for (const est of estudiantesData) {
       try {
         const userCred = await createUserWithEmailAndPassword(this.auth, est.emailInstitucional, 'Estudiante123!');
         const uid = userCred.user.uid;
-        estudiantesUIDs.push(uid);
 
         // Guardar en colección usuarios
         await setDoc(doc(this.firestore, 'usuarios', uid), {
@@ -206,7 +206,7 @@ export class SeedDataService {
         });
 
         // Guardar en colección estudiantes
-        await addDoc(collection(this.firestore, 'estudiantes'), {
+        const estudianteRef = await addDoc(collection(this.firestore, 'estudiantes'), {
           nombres: est.nombres,
           apellidos: est.apellidos,
           nivel: est.nivel,
@@ -220,7 +220,9 @@ export class SeedDataService {
           uid: uid
         });
 
-        console.log(`✅ Estudiante creado: ${est.nombres} ${est.apellidos}`);
+        estudiantesIds.push(estudianteRef.id); // Guardar ID del documento
+        estudiantesUIDMap.set(uid, estudianteRef.id);
+        console.log(`✅ Estudiante creado: ${est.nombres} ${est.apellidos} (DocID: ${estudianteRef.id})`);
       } catch (error: any) {
         if (error.code !== 'auth/email-already-in-use') {
           console.error(`Error creando estudiante ${est.emailInstitucional}:`, error);
@@ -234,8 +236,8 @@ export class SeedDataService {
     const cursosList = Object.entries(cursosIds);
     let matriculasCreadas = 0;
 
-    for (let i = 0; i < estudiantesUIDs.length; i++) {
-      const uid = estudiantesUIDs[i];
+    for (let i = 0; i < estudiantesIds.length; i++) {
+      const docId = estudiantesIds[i]; // Usar ID del documento
       // Asignar 2-3 cursos aleatorios a cada estudiante
       const numCursos = Math.floor(Math.random() * 2) + 2;
       const cursosAsignados = new Set<number>();
@@ -247,7 +249,7 @@ export class SeedDataService {
       for (const cursoIndex of cursosAsignados) {
         try {
           await addDoc(collection(this.firestore, 'matriculas'), {
-            estudianteId: uid,
+            estudianteId: docId, // Usar ID del documento
             cursoId: cursosList[cursoIndex][1],
             estado: 'activa',
             fechaInscripcion: new Date(),

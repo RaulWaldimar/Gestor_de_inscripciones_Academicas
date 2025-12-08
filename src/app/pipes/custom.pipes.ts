@@ -9,7 +9,8 @@ export class EstadoMatriculaPipe implements PipeTransform {
     const estados: { [key: string]: string } = {
       'activa': 'Activa',
       'completada': 'Completada',
-      'retirada': 'Retirada'
+      'retirada': 'Retirada',
+      'cancelada': 'Cancelada'
     };
     return estados[value] || value;
   }

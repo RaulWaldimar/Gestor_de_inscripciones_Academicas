@@ -85,11 +85,12 @@ export class DocentePanelComponent implements OnInit {
 
     this.matriculaService.obtenerMatriculasPorCurso(this.selectedCursoId).subscribe({
       next: (matriculas) => {
-        this.matriculas = matriculas;
+        this.matriculas = matriculas.filter(m => m.estado === 'activa');
         // Cargar información de los estudiantes
         this.cargarEstudiantes();
       },
       error: (err) => {
+        console.error('Error al cargar matrículas:', err);
         this.error = 'Error al cargar las matrículas';
         this.loading = false;
       }
@@ -98,9 +99,9 @@ export class DocentePanelComponent implements OnInit {
 
   cargarEstudiantes(): void {
     this.estudiantes.clear();
-    const uids = this.matriculas.map(m => m.estudianteId);
+    const docIds = this.matriculas.map(m => m.estudianteId); // IDs de documentos, no UIDs
 
-    if (uids.length === 0) {
+    if (docIds.length === 0) {
       this.loading = false;
       return;
     }
@@ -109,13 +110,15 @@ export class DocentePanelComponent implements OnInit {
     this.estudianteService.obtenerEstudiantes().subscribe({
       next: (estudiantes) => {
         estudiantes.forEach(est => {
-          if (est.uid && uids.includes(est.uid)) {
-            this.estudiantes.set(est.uid, est);
+          if (est.id && docIds.includes(est.id)) { // Usar ID del documento
+            this.estudiantes.set(est.id, est);
           }
         });
+        console.log('✅ Estudiantes cargados:', this.estudiantes.size);
         this.loading = false;
       },
       error: (err) => {
+        console.error('Error al cargar estudiantes:', err);
         this.error = 'Error al cargar datos de estudiantes';
         this.loading = false;
       }
@@ -128,7 +131,7 @@ export class DocentePanelComponent implements OnInit {
 
   get matriculasFiltradas(): Matricula[] {
     return this.matriculas.filter(m => {
-      const estudiante = this.estudiantes.get(m.estudianteId);
+      const estudiante = this.estudiantes.get(m.estudianteId); // Usar estudianteId
       if (!estudiante) return true;
       return (
         estudiante.nombres.toLowerCase().includes(this.buscador.toLowerCase()) ||
@@ -141,8 +144,8 @@ export class DocentePanelComponent implements OnInit {
     return this.cursos.find(c => c.id === this.selectedCursoId);
   }
 
-  obtenerNombreEstudiante(uid: string): string {
-    const estudiante = this.estudiantes.get(uid);
+  obtenerNombreEstudiante(docId: string): string {
+    const estudiante = this.estudiantes.get(docId); // Usar docId
     return estudiante ? `${estudiante.nombres} ${estudiante.apellidos}` : 'Desconocido';
   }
 }

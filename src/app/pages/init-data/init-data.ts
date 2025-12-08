@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SeedDataService } from '../../services/seed-data.service';
+import { InitService } from '../../services/init.service';
 import { CleanupService } from '../../services/cleanup.service';
 
 @Component({
@@ -18,7 +18,7 @@ export class InitDataComponent implements OnInit {
   cleaningResults: { eliminados: number; errores: number } | null = null;
 
   constructor(
-    private seedDataService: SeedDataService,
+    private initService: InitService,
     private cleanupService: CleanupService
   ) {}
 
@@ -34,7 +34,7 @@ export class InitDataComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.seedDataService.initializeDatabase().subscribe({
+    this.initService.inicializarDatos().subscribe({
       next: () => {
         this.loading = false;
         this.completed = true;
