@@ -6,6 +6,12 @@ import { EstudianteService } from '../../services/estudiante.service';
 import { CursoService } from '../../services/curso.service';
 import { Matricula, Estudiante, Curso } from '../../models';
 import { EstadoMatriculaPipe } from '../../pipes/custom.pipes';
+import { forkJoin } from 'rxjs';
+
+interface MatriculaConDatos extends Matricula {
+  nombreEstudiante?: string;
+  nombreCurso?: string;
+}
 
 @Component({
   selector: 'app-matriculas',
@@ -15,9 +21,11 @@ import { EstadoMatriculaPipe } from '../../pipes/custom.pipes';
   styleUrls: ['./matriculas.css']
 })
 export class MatriculasComponent implements OnInit {
-  matriculas: Matricula[] = [];
+  matriculas: MatriculaConDatos[] = [];
   estudiantes: Estudiante[] = [];
   cursos: Curso[] = [];
+  estudiantesMap: Map<string, Estudiante> = new Map();
+  cursosMap: Map<string, Curso> = new Map();
   loading = true;
   error: string | null = null;
   showForm = false;
@@ -50,18 +58,52 @@ export class MatriculasComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    Promise.all([
-      this.matriculaService.obtenerMatriculas().toPromise(),
-      this.estudianteService.obtenerEstudiantes().toPromise(),
-      this.cursoService.obtenerCursos().toPromise()
-    ]).then(([matriculas, estudiantes, cursos]) => {
-      this.matriculas = matriculas || [];
-      this.estudiantes = estudiantes || [];
-      this.cursos = cursos || [];
-      this.loading = false;
-    }).catch((err) => {
-      this.error = 'Error al cargar los datos';
-      this.loading = false;
+    forkJoin({
+      matriculas: this.matriculaService.obtenerMatriculas(),
+      estudiantes: this.estudianteService.obtenerEstudiantes(),
+      cursos: this.cursoService.obtenerCursos()
+    }).subscribe({
+      next: (resultado) => {
+        const matriculas = resultado.matriculas || [];
+        const estudiantes = resultado.estudiantes || [];
+        const cursos = resultado.cursos || [];
+
+        // Guardar para el formulario
+        this.estudiantes = estudiantes;
+        this.cursos = cursos;
+
+        // Crear mapas para búsqueda rápida
+        this.estudiantesMap.clear();
+        this.cursosMap.clear();
+
+        estudiantes.forEach(e => {
+          if (e.id) this.estudiantesMap.set(e.id, e);
+        });
+
+        cursos.forEach(c => {
+          if (c.id) this.cursosMap.set(c.id, c);
+        });
+
+        // Enriquecer matrículas con datos
+        this.matriculas = matriculas.map(m => ({
+          ...m,
+          nombreEstudiante: this.obtenerNombreEstudiante(m.estudianteId),
+          nombreCurso: this.obtenerNombreCurso(m.cursoId)
+        }));
+
+        console.log('✅ Datos cargados:');
+        console.log('   Matrículas:', this.matriculas.length);
+        console.log('   Estudiantes:', this.estudiantesMap.size);
+        console.log('   Cursos:', this.cursosMap.size);
+        console.log('   Matrículas válidas:', this.matriculas.filter(m => m.nombreEstudiante !== 'Estudiante no encontrado').length);
+        
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('❌ Error cargando datos:', err);
+        this.error = 'Error al cargar los datos. Por favor, recarga la página.';
+        this.loading = false;
+      }
     });
   }
 
@@ -88,6 +130,7 @@ export class MatriculasComponent implements OnInit {
             this.resetForm();
           },
           error: (err) => {
+            console.error('Error creando matrícula:', err);
             this.error = 'Error al crear la matrícula';
             this.loading = false;
           }
@@ -103,6 +146,7 @@ export class MatriculasComponent implements OnInit {
           this.cargarDatos();
         },
         error: (err) => {
+          console.error('Error cancelando matrícula:', err);
           this.error = 'Error al cancelar la matrícula';
         }
       });
@@ -115,21 +159,24 @@ export class MatriculasComponent implements OnInit {
   }
 
   obtenerNombreEstudiante(estudianteId: string): string {
-    const est = this.estudiantes.find(e => e.id === estudianteId);
-    return est ? `${est.nombres} ${est.apellidos}` : 'Estudiante no encontrado';
+    const est = this.estudiantesMap.get(estudianteId);
+    if (est) {
+      return `${est.nombres} ${est.apellidos}`;
+    }
+    return 'Estudiante no encontrado';
   }
 
   obtenerNombreCurso(cursoId: string): string {
-    const curso = this.cursos.find(c => c.id === cursoId);
+    const curso = this.cursosMap.get(cursoId);
     return curso ? curso.nombre : 'Curso no encontrado';
   }
 
-  get matriculasFiltradas(): Matricula[] {
+  get matriculasFiltradas(): MatriculaConDatos[] {
     return this.matriculas.filter(m => {
       const coincideEstado = this.filtroEstado === '' || m.estado === this.filtroEstado;
       const coincideBusqueda = this.buscador === '' ||
-        this.obtenerNombreEstudiante(m.estudianteId).toLowerCase().includes(this.buscador.toLowerCase()) ||
-        this.obtenerNombreCurso(m.cursoId).toLowerCase().includes(this.buscador.toLowerCase());
+        (m.nombreEstudiante?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false) ||
+        (m.nombreCurso?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false);
       return coincideEstado && coincideBusqueda;
     });
   }

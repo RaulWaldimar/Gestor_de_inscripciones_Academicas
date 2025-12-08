@@ -99,8 +99,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let matricula of matriculasFiltradas">
-          <td>{{ obtenerNombreEstudiante(matricula.estudianteId) }}</td>
-          <td>{{ obtenerNombreCurso(matricula.cursoId) }}</td>
+          <td>{{ matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId) }}</td>
+          <td>{{ matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId) }}</td>
           <td>{{ matricula.fechaInscripcion | date: 'short' }}</td>
           <td>
             <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
