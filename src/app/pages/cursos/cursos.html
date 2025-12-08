@@ -1,1 +1,33 @@
-<p>cursos works!</p>
+<div class="contenedor">
+
+  <h2>Gestión de Cursos</h2>
+
+  <form [formGroup]="courseForm" (ngSubmit)="crearCurso()">
+
+    <label>Nombre del curso</label>
+    <input type="text" formControlName="nombre">
+
+    <label>Docente</label>
+    <input type="text" formControlName="docente">
+
+    <label>Horario</label>
+    <input type="text" formControlName="horario">
+
+    <label>Cupos</label>
+    <input type="number" formControlName="cupos">
+
+    <label>Semestre</label>
+    <input type="text" formControlName="semestre">
+
+    <button type="submit">Crear curso</button>
+  </form>
+
+  <h3>Listado de Cursos</h3>
+
+  <ul>
+    <li *ngFor="let c of cursos">
+      <strong>{{ c.nombre }}</strong> - {{ c.docente }} ({{ c.horario }})
+    </li>
+  </ul>
+
+</div>
