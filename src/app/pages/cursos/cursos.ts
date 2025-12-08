@@ -1,41 +1,127 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CourseService } from '../../services/course.service';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CursoService } from '../../services/curso.service';
+import { Curso } from '../../models';
+import { EstadoCursoPipe } from '../../pipes/custom.pipes';
 
 @Component({
   selector: 'app-cursos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, EstadoCursoPipe],
   templateUrl: './cursos.html',
   styleUrls: ['./cursos.css']
 })
-export class CursosComponent {
+export class CursosComponent implements OnInit {
+  cursos: Curso[] = [];
+  loading = true;
+  error: string | null = null;
+  showForm = false;
+  editandoId: string | null = null;
+  buscador = '';
 
-  courseForm: FormGroup;
-  cursos: any[] = [];
+  cursoForm!: FormGroup;
 
   constructor(
-    private fb: FormBuilder,
-    private courseService: CourseService
-  ) {
-    this.courseForm = this.fb.group({
-      nombre: ['', Validators.required],
+    private cursoService: CursoService,
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.initForm();
+    this.cargarCursos();
+  }
+
+  initForm(): void {
+    this.cursoForm = this.fb.group({
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      codigo: ['', [Validators.required, Validators.minLength(2)]],
+      descripcion: ['', Validators.required],
       docente: ['', Validators.required],
       horario: ['', Validators.required],
-      cupos: ['', Validators.required],
-      semestre: ['', Validators.required]
-    });
-
-    this.courseService.getCourses().subscribe(data => {
-      this.cursos = data;
+      semestre: ['', [Validators.required, Validators.min(1)]],
+      capacidad: ['', [Validators.required, Validators.min(1)]],
+      estado: ['activo', Validators.required]
     });
   }
 
-  crearCurso() {
-    if (this.courseForm.invalid) return;
+  cargarCursos(): void {
+    this.loading = true;
+    this.error = null;
+    this.cursoService.obtenerCursos().subscribe({
+      next: (cursos) => {
+        this.cursos = cursos;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Error al cargar los cursos';
+        this.loading = false;
+      }
+    });
+  }
 
-    this.courseService.addCourse(this.courseForm.value);
-    this.courseForm.reset();
+  guardarCurso(): void {
+    if (this.cursoForm.invalid) return;
+
+    this.loading = true;
+    const dataCurso = this.cursoForm.value;
+
+    if (this.editandoId) {
+      this.cursoService.actualizarCurso(this.editandoId, dataCurso).subscribe({
+        next: () => {
+          this.cargarCursos();
+          this.resetForm();
+        },
+        error: (err) => {
+          this.error = 'Error al actualizar el curso';
+          this.loading = false;
+        }
+      });
+    } else {
+      dataCurso.fechaCreacion = new Date();
+      dataCurso.inscritos = 0;
+      this.cursoService.crearCurso(dataCurso).subscribe({
+        next: () => {
+          this.cargarCursos();
+          this.resetForm();
+        },
+        error: (err) => {
+          this.error = 'Error al crear el curso';
+          this.loading = false;
+        }
+      });
+    }
+  }
+
+  editarCurso(curso: Curso): void {
+    this.editandoId = curso.id;
+    this.cursoForm.patchValue(curso);
+    this.showForm = true;
+  }
+
+  eliminarCurso(id: string): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este curso?')) {
+      this.cursoService.eliminarCurso(id).subscribe({
+        next: () => {
+          this.cargarCursos();
+        },
+        error: (err) => {
+          this.error = 'Error al eliminar el curso';
+        }
+      });
+    }
+  }
+
+  resetForm(): void {
+    this.cursoForm.reset({ estado: 'activo' });
+    this.editandoId = null;
+    this.showForm = false;
+  }
+
+  get cursosFiltrados(): Curso[] {
+    return this.cursos.filter(c =>
+      c.nombre.toLowerCase().includes(this.buscador.toLowerCase()) ||
+      c.codigo.toLowerCase().includes(this.buscador.toLowerCase())
+    );
   }
 }

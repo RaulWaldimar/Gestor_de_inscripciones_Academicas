@@ -1,4 +1,80 @@
-<div class="dashboard">
-  <h1>Bienvenido al Panel Principal</h1>
-  <p>Desde aquí podrás ver tus cursos, matrículas y opciones del sistema.</p>
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>Mi Dashboard</h1>
+    <p *ngIf="estudiante">Bienvenido, {{ estudiante.nombre }} {{ estudiante.apellido }}</p>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando información...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Contenido Principal -->
+  <div *ngIf="!loading && !error" class="content">
+    <!-- Información del Estudiante -->
+    <div class="info-section">
+      <h2>Información del Estudiante</h2>
+      <div class="info-grid" *ngIf="estudiante">
+        <div class="info-item">
+          <label>Email:</label>
+          <p>{{ estudiante.email }}</p>
+        </div>
+        <div class="info-item">
+          <label>Matrícula:</label>
+          <p>{{ estudiante.matricula }}</p>
+        </div>
+        <div class="info-item">
+          <label>Carrera:</label>
+          <p>{{ estudiante.carrera }}</p>
+        </div>
+        <div class="info-item">
+          <label>Semestre:</label>
+          <p>{{ estudiante.semestre }}</p>
+        </div>
+        <div class="info-item">
+          <label>Estado:</label>
+          <p>{{ estudiante.estado }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cursos Inscritos -->
+    <div class="cursos-section">
+      <div class="section-header">
+        <h2>Mis Cursos Inscritos</h2>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Buscar por nombre de curso..."
+          [(ngModel)]="buscador"
+        />
+      </div>
+
+      <div *ngIf="matriculasFiltradas.length === 0" class="empty-state">
+        <p>No hay cursos inscritos</p>
+      </div>
+
+      <div *ngIf="matriculasFiltradas.length > 0" class="cursos-grid">
+        <div *ngFor="let matricula of matriculasFiltradas" class="curso-card">
+          <div class="curso-header">
+            <h3>{{ obtenerNombreCurso(matricula.cursoId) }}</h3>
+            <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
+              {{ matricula.estado | estadoMatricula }}
+            </span>
+          </div>
+          <div class="curso-info">
+            <p><strong>Docente:</strong> {{ obtenerDocente(matricula.cursoId) }}</p>
+            <p><strong>Horario:</strong> {{ obtenerHorario(matricula.cursoId) }}</p>
+            <p><strong>Fecha de Inscripción:</strong> {{ matricula.fechaInscripcion | date: 'short' }}</p>
+            <p *ngIf="matricula.calificacion"><strong>Calificación:</strong> {{ matricula.calificacion }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

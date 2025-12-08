@@ -1,0 +1,107 @@
+<div class="estadisticas-container">
+  <div class="header">
+    <h1>Panel de Estadísticas</h1>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando estadísticas...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error && estadisticas" class="content">
+    <!-- Tarjetas de Resumen -->
+    <div class="stats-grid">
+      <div class="stat-card total">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+          <p class="stat-label">Total Estudiantes</p>
+          <p class="stat-value">{{ estadisticas.totalEstudiantes }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-content">
+          <p class="stat-label">Total Cursos</p>
+          <p class="stat-value">{{ estadisticas.totalCursos }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📝</div>
+        <div class="stat-content">
+          <p class="stat-label">Total Matrículas</p>
+          <p class="stat-value">{{ estadisticas.totalMatriculas }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <p class="stat-label">Estudiantes Activos</p>
+          <p class="stat-value">{{ estadisticas.estudiantesActivos }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📖</div>
+        <div class="stat-content">
+          <p class="stat-label">Cursos Activos</p>
+          <p class="stat-value">{{ estadisticas.cursosActivos }}</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">🎓</div>
+        <div class="stat-content">
+          <p class="stat-label">Matrículas Activas</p>
+          <p class="stat-value">{{ estadisticas.matriculasActivas }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tasa de Ocupación -->
+    <div class="ocupacion-section">
+      <h2>Tasa de Ocupación General</h2>
+      <div class="ocupacion-container">
+        <div class="ocupacion-bar">
+          <div 
+            class="ocupacion-fill" 
+            [style.width.%]="estadisticas.tasaOcupacion">
+          </div>
+        </div>
+        <p class="ocupacion-text">{{ estadisticas.tasaOcupacion | number: '1.2-2' }}% de capacidad utilizada</p>
+      </div>
+    </div>
+
+    <!-- Matrículas por Curso -->
+    <div class="cursos-matriculas-section">
+      <h2>Inscritos por Curso</h2>
+      <div *ngIf="Object.keys(matriculasPorCurso).length === 0" class="empty-state">
+        <p>No hay datos de matrículas disponibles</p>
+      </div>
+      <table *ngIf="Object.keys(matriculasPorCurso).length > 0" class="matriculas-table">
+        <thead>
+          <tr>
+            <th>Curso</th>
+            <th>Inscritos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let curso of Object.keys(matriculasPorCurso)">
+            <td>{{ curso }}</td>
+            <td>
+              <span class="badge">{{ matriculasPorCurso[curso] }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

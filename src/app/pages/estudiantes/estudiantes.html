@@ -1,0 +1,135 @@
+<div class="estudiantes-container">
+  <div class="header">
+    <h1>Gestión de Estudiantes</h1>
+    <button *ngIf="!showForm" class="btn btn-primary" (click)="showForm = true">
+      + Nuevo Estudiante
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando estudiantes...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="showForm" class="form-modal">
+    <div class="form-card">
+      <h2>{{ editandoId ? 'Editar Estudiante' : 'Nuevo Estudiante' }}</h2>
+      <form [formGroup]="estudianteForm" (ngSubmit)="guardarEstudiante()">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" formControlName="nombre" placeholder="Ingrese el nombre">
+          <span *ngIf="estudianteForm.get('nombre')?.invalid && estudianteForm.get('nombre')?.touched" class="error">
+            El nombre es requerido (mínimo 3 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Apellido *</label>
+          <input type="text" formControlName="apellido" placeholder="Ingrese el apellido">
+          <span *ngIf="estudianteForm.get('apellido')?.invalid && estudianteForm.get('apellido')?.touched" class="error">
+            El apellido es requerido (mínimo 3 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" formControlName="email" placeholder="correo@ejemplo.com">
+          <span *ngIf="estudianteForm.get('email')?.invalid && estudianteForm.get('email')?.touched" class="error">
+            Email inválido
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Matrícula *</label>
+          <input type="text" formControlName="matricula" placeholder="Número de matrícula">
+          <span *ngIf="estudianteForm.get('matricula')?.invalid && estudianteForm.get('matricula')?.touched" class="error">
+            La matrícula es requerida (mínimo 4 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Carrera *</label>
+          <input type="text" formControlName="carrera" placeholder="Ej: Ingeniería en Sistemas">
+          <span *ngIf="estudianteForm.get('carrera')?.invalid && estudianteForm.get('carrera')?.touched" class="error">
+            La carrera es requerida
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Semestre *</label>
+          <input type="number" formControlName="semestre" placeholder="Número de semestre" min="1" max="10">
+          <span *ngIf="estudianteForm.get('semestre')?.invalid && estudianteForm.get('semestre')?.touched" class="error">
+            Semestre inválido (1-10)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Estado *</label>
+          <select formControlName="estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+            <option value="graduado">Graduado</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="estudianteForm.invalid">
+            {{ editandoId ? 'Actualizar' : 'Crear' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de Estudiantes -->
+  <div *ngIf="!showForm && !loading && !error" class="estudiantes-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por nombre, apellido, email o matrícula..."
+        [(ngModel)]="buscador"
+      />
+    </div>
+
+    <div *ngIf="estudiantesFiltrados.length === 0" class="empty-state">
+      <p>No hay estudiantes disponibles</p>
+    </div>
+
+    <table *ngIf="estudiantesFiltrados.length > 0" class="estudiantes-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Email</th>
+          <th>Matrícula</th>
+          <th>Carrera</th>
+          <th>Semestre</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let estudiante of estudiantesFiltrados">
+          <td>{{ estudiante.nombre }}</td>
+          <td>{{ estudiante.apellido }}</td>
+          <td>{{ estudiante.email }}</td>
+          <td>{{ estudiante.matricula }}</td>
+          <td>{{ estudiante.carrera }}</td>
+          <td>{{ estudiante.semestre }}</td>
+          <td>
+            <span class="estado-badge" [ngClass]="'estado-' + estudiante.estado">
+              {{ estudiante.estado | estadoEstudiante }}
+            </span>
+          </td>
+          <td class="acciones">
+            <button class="btn btn-sm btn-edit" (click)="editarEstudiante(estudiante)">Editar</button>
+            <button class="btn btn-sm btn-delete" (click)="eliminarEstudiante(estudiante.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

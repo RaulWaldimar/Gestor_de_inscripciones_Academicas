@@ -1,33 +1,141 @@
-<div class="contenedor">
+<div class="cursos-container">
+  <div class="header">
+    <h1>Gestión de Cursos</h1>
+    <button *ngIf="!showForm" class="btn btn-primary" (click)="showForm = true">
+      + Nuevo Curso
+    </button>
+  </div>
 
-  <h2>Gestión de Cursos</h2>
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando cursos...
+  </div>
 
-  <form [formGroup]="courseForm" (ngSubmit)="crearCurso()">
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
 
-    <label>Nombre del curso</label>
-    <input type="text" formControlName="nombre">
+  <!-- Formulario -->
+  <div *ngIf="showForm" class="form-modal">
+    <div class="form-card">
+      <h2>{{ editandoId ? 'Editar Curso' : 'Nuevo Curso' }}</h2>
+      <form [formGroup]="cursoForm" (ngSubmit)="guardarCurso()">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" formControlName="nombre" placeholder="Ingrese el nombre del curso">
+          <span *ngIf="cursoForm.get('nombre')?.invalid && cursoForm.get('nombre')?.touched" class="error">
+            El nombre es requerido (mínimo 3 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Código *</label>
+          <input type="text" formControlName="codigo" placeholder="Código del curso">
+          <span *ngIf="cursoForm.get('codigo')?.invalid && cursoForm.get('codigo')?.touched" class="error">
+            El código es requerido (mínimo 2 caracteres)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Descripción *</label>
+          <textarea formControlName="descripcion" placeholder="Descripción del curso"></textarea>
+          <span *ngIf="cursoForm.get('descripcion')?.invalid && cursoForm.get('descripcion')?.touched" class="error">
+            La descripción es requerida
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Docente *</label>
+          <input type="text" formControlName="docente" placeholder="Nombre del docente">
+          <span *ngIf="cursoForm.get('docente')?.invalid && cursoForm.get('docente')?.touched" class="error">
+            El docente es requerido
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Horario *</label>
+          <input type="text" formControlName="horario" placeholder="Ej: Lunes-Miércoles 10:00-12:00">
+          <span *ngIf="cursoForm.get('horario')?.invalid && cursoForm.get('horario')?.touched" class="error">
+            El horario es requerido
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Semestre *</label>
+          <input type="number" formControlName="semestre" placeholder="Número de semestre" min="1">
+          <span *ngIf="cursoForm.get('semestre')?.invalid && cursoForm.get('semestre')?.touched" class="error">
+            El semestre es requerido (mínimo 1)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Capacidad *</label>
+          <input type="number" formControlName="capacidad" placeholder="Número máximo de estudiantes" min="1">
+          <span *ngIf="cursoForm.get('capacidad')?.invalid && cursoForm.get('capacidad')?.touched" class="error">
+            La capacidad es requerida (mínimo 1)
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Estado *</label>
+          <select formControlName="estado">
+            <option value="activo">Activo</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="cursoForm.invalid">
+            {{ editandoId ? 'Actualizar' : 'Crear' }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-    <label>Docente</label>
-    <input type="text" formControlName="docente">
+  <!-- Lista de Cursos -->
+  <div *ngIf="!showForm && !loading && !error" class="cursos-section">
+    <div class="search-bar">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por nombre o código..."
+        [(ngModel)]="buscador"
+      />
+    </div>
 
-    <label>Horario</label>
-    <input type="text" formControlName="horario">
+    <div *ngIf="cursosFiltrados.length === 0" class="empty-state">
+      <p>No hay cursos disponibles</p>
+    </div>
 
-    <label>Cupos</label>
-    <input type="number" formControlName="cupos">
-
-    <label>Semestre</label>
-    <input type="text" formControlName="semestre">
-
-    <button type="submit">Crear curso</button>
-  </form>
-
-  <h3>Listado de Cursos</h3>
-
-  <ul>
-    <li *ngFor="let c of cursos">
-      <strong>{{ c.nombre }}</strong> - {{ c.docente }} ({{ c.horario }})
-    </li>
-  </ul>
-
+    <table *ngIf="cursosFiltrados.length > 0" class="cursos-table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Código</th>
+          <th>Docente</th>
+          <th>Horario</th>
+          <th>Semestre</th>
+          <th>Inscritos/Capacidad</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let curso of cursosFiltrados">
+          <td>{{ curso.nombre }}</td>
+          <td>{{ curso.codigo }}</td>
+          <td>{{ curso.docente }}</td>
+          <td>{{ curso.horario }}</td>
+          <td>{{ curso.semestre }}</td>
+          <td>{{ curso.inscritos }}/{{ curso.capacidad }}</td>
+          <td>
+            <span class="estado-badge" [ngClass]="'estado-' + curso.estado">
+              {{ curso.estado | estadoCurso }}
+            </span>
+          </td>
+          <td class="acciones">
+            <button class="btn btn-sm btn-edit" (click)="editarCurso(curso)">Editar</button>
+            <button class="btn btn-sm btn-delete" (click)="eliminarCurso(curso.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

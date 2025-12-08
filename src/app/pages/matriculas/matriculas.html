@@ -1,0 +1,124 @@
+<div class="matriculas-container">
+  <div class="header">
+    <h1>Gestión de Matrículas</h1>
+    <button *ngIf="!showForm" class="btn btn-primary" (click)="showForm = true">
+      + Nueva Matrícula
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="alert alert-info">
+    <span class="spinner"></span> Cargando matrículas...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="showForm" class="form-modal">
+    <div class="form-card">
+      <h2>Nueva Matrícula</h2>
+      <form [formGroup]="matriculaForm" (ngSubmit)="guardarMatricula()">
+        <div class="form-group">
+          <label>Estudiante *</label>
+          <select formControlName="estudianteId">
+            <option value="">-- Seleccionar estudiante --</option>
+            <option *ngFor="let est of estudiantes" [value]="est.id">
+              {{ est.nombre }} {{ est.apellido }} ({{ est.matricula }})
+            </option>
+          </select>
+          <span *ngIf="matriculaForm.get('estudianteId')?.invalid && matriculaForm.get('estudianteId')?.touched" class="error">
+            Debe seleccionar un estudiante
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Curso *</label>
+          <select formControlName="cursoId">
+            <option value="">-- Seleccionar curso --</option>
+            <option *ngFor="let curso of cursos" [value]="curso.id">
+              {{ curso.nombre }} ({{ curso.codigo }}) - Sem {{ curso.semestre }}
+            </option>
+          </select>
+          <span *ngIf="matriculaForm.get('cursoId')?.invalid && matriculaForm.get('cursoId')?.touched" class="error">
+            Debe seleccionar un curso
+          </span>
+        </div>
+        <div class="form-group">
+          <label>Estado *</label>
+          <select formControlName="estado">
+            <option value="activa">Activa</option>
+            <option value="completada">Completada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-success" [disabled]="matriculaForm.invalid">
+            Crear Matrícula
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de Matrículas -->
+  <div *ngIf="!showForm && !loading && !error" class="matriculas-section">
+    <div class="filters">
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Buscar por estudiante o curso..."
+        [(ngModel)]="buscador"
+      />
+      <select [(ngModel)]="filtroEstado" class="filter-select">
+        <option value="">-- Todos los estados --</option>
+        <option value="activa">Activa</option>
+        <option value="completada">Completada</option>
+        <option value="cancelada">Cancelada</option>
+      </select>
+    </div>
+
+    <div *ngIf="matriculasFiltradas.length === 0" class="empty-state">
+      <p>No hay matrículas disponibles</p>
+    </div>
+
+    <table *ngIf="matriculasFiltradas.length > 0" class="matriculas-table">
+      <thead>
+        <tr>
+          <th>Estudiante</th>
+          <th>Curso</th>
+          <th>Fecha Inscripción</th>
+          <th>Estado</th>
+          <th>Calificación</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let matricula of matriculasFiltradas">
+          <td>{{ obtenerNombreEstudiante(matricula.estudianteId) }}</td>
+          <td>{{ obtenerNombreCurso(matricula.cursoId) }}</td>
+          <td>{{ matricula.fechaInscripcion | date: 'short' }}</td>
+          <td>
+            <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
+              {{ matricula.estado | estadoMatricula }}
+            </span>
+          </td>
+          <td>{{ matricula.calificacion || 'Sin calificar' }}</td>
+          <td class="acciones">
+            <button 
+              *ngIf="matricula.estado === 'activa'"
+              class="btn btn-sm btn-delete" 
+              (click)="cancelarMatricula(matricula.id)">
+              Cancelar
+            </button>
+            <span *ngIf="matricula.estado !== 'activa'" class="text-muted">-</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
