@@ -45,7 +45,7 @@
 
           <div class="credential-box student">
             <h4>📚 Estudiante (Ejemplo)</h4>
-            <p><strong>Email:</strong> juan.garcía@cole.pe</p>
+            <p><strong>Email:</strong> juan.garcia@cole.pe</p>
             <p><strong>Contraseña:</strong> Estudiante123!</p>
             <p><strong>Rol:</strong> Estudiante</p>
           </div>
@@ -58,7 +58,20 @@
           </div>
         </div>
 
-        <a href="/login" class="btn btn-success">Ir a Login</a>
+        <div class="action-buttons">
+          <a href="/login" class="btn btn-success">Ir a Login</a>
+          <button class="btn btn-warning" (click)="limpiarDuplicados()" [disabled]="cleaning">
+            <span *ngIf="!cleaning">🧹 Limpiar Duplicados</span>
+            <span *ngIf="cleaning"><span class="spinner"></span> Limpiando...</span>
+          </button>
+        </div>
+
+        <div *ngIf="cleaningResults" class="cleanup-results">
+          <h3>Resultados de Limpieza:</h3>
+          <p>✅ Eliminados: {{ cleaningResults.eliminados }}</p>
+          <p *ngIf="cleaningResults.errores > 0" class="error-text">⚠️ Errores: {{ cleaningResults.errores }}</p>
+          <p *ngIf="cleaningResults.errores === 0" class="success-text">✅ Sin errores</p>
+        </div>
       </div>
 
       <div *ngIf="error" class="error-state">

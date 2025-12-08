@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeedDataService } from '../../services/seed-data.service';
+import { CleanupService } from '../../services/cleanup.service';
 
 @Component({
   selector: 'app-init-data',
@@ -13,8 +14,13 @@ export class InitDataComponent implements OnInit {
   loading = false;
   completed = false;
   error: string | null = null;
+  cleaning = false;
+  cleaningResults: { eliminados: number; errores: number } | null = null;
 
-  constructor(private seedDataService: SeedDataService) {}
+  constructor(
+    private seedDataService: SeedDataService,
+    private cleanupService: CleanupService
+  ) {}
 
   ngOnInit(): void {
     // Verificar si ya se inicializó
@@ -38,6 +44,29 @@ export class InitDataComponent implements OnInit {
       error: (err) => {
         this.loading = false;
         this.error = 'Error al inicializar la base de datos: ' + err.message;
+        console.error('Error:', err);
+      }
+    });
+  }
+
+  limpiarDuplicados(): void {
+    if (!confirm('⚠️ Esto eliminará todos los duplicados (cuentas con tildes y cursos duplicados). ¿Estás seguro?')) {
+      return;
+    }
+
+    this.cleaning = true;
+    this.error = null;
+    this.cleaningResults = null;
+
+    this.cleanupService.limpiarDuplicados().subscribe({
+      next: (results) => {
+        this.cleaning = false;
+        this.cleaningResults = results;
+        console.log(`✅ Limpieza completada: ${results.eliminados} eliminados, ${results.errores} errores`);
+      },
+      error: (err) => {
+        this.cleaning = false;
+        this.error = 'Error durante la limpieza: ' + err.message;
         console.error('Error:', err);
       }
     });
