@@ -14,7 +14,7 @@ export class AuthService {
   }
 
   // Registrar usuarios (si lo necesitas)
-register(email: string, password: string) {
+register(email: string, password: string, role: string = 'estudiante') {
   return createUserWithEmailAndPassword(this.auth, email, password);
 }
 
