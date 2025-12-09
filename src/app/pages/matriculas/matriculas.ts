@@ -158,6 +158,34 @@ export class MatriculasComponent implements OnInit {
     }
   }
 
+  revertirCancelacion(id: string): void {
+    if (confirm('¿Deseas reactivar esta matrícula a estado activo?')) {
+      this.matriculaService.actualizarMatricula(id, { estado: 'activa' }).subscribe({
+        next: () => {
+          this.cargarDatos();
+        },
+        error: (err) => {
+          console.error('Error reactivando matrícula:', err);
+          this.error = 'Error al reactivar la matrícula';
+        }
+      });
+    }
+  }
+
+  eliminarMatricula(id: string): void {
+    if (confirm('¿Estás seguro de que deseas eliminar esta matrícula? Esta acción no se puede deshacer.')) {
+      this.matriculaService.eliminarMatricula(id).subscribe({
+        next: () => {
+          this.cargarDatos();
+        },
+        error: (err) => {
+          console.error('Error eliminando matrícula:', err);
+          this.error = 'Error al eliminar la matrícula';
+        }
+      });
+    }
+  }
+
   resetForm(): void {
     this.matriculaForm.reset({ estado: 'activa' });
     this.showForm = false;

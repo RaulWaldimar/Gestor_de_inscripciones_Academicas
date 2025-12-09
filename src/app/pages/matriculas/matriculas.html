@@ -115,7 +115,19 @@
               (click)="cancelarMatricula(matricula.id!)">
               Cancelar
             </button>
-            <span *ngIf="matricula.estado !== 'activa'" class="text-muted">-</span>
+            <button 
+              *ngIf="matricula.estado === 'cancelada' && matricula.id"
+              class="btn btn-sm btn-success" 
+              (click)="revertirCancelacion(matricula.id!)">
+              Reactivar
+            </button>
+            <button 
+              *ngIf="matricula.id"
+              class="btn btn-sm btn-danger" 
+              (click)="eliminarMatricula(matricula.id!)">
+              Eliminar
+            </button>
+            <span *ngIf="matricula.estado === 'completada'" class="text-muted">-</span>
           </td>
         </tr>
       </tbody>
