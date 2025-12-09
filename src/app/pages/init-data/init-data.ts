@@ -71,4 +71,36 @@ export class InitDataComponent implements OnInit {
       }
     });
   }
+
+  reinicializarDatabase(): void {
+    if (!confirm('⚠️ Esto borrará todos los datos y volverá a crear la base de datos desde cero. ¿Estás COMPLETAMENTE seguro?')) {
+      return;
+    }
+
+    if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán todos los datos. ¿Continuar?')) {
+      return;
+    }
+
+    // Limpiar localStorage
+    localStorage.removeItem('dbInitialized');
+    
+    // Reiniciar la inicialización
+    this.loading = true;
+    this.error = null;
+    this.completed = false;
+
+    this.initService.inicializarDatos().subscribe({
+      next: () => {
+        this.loading = false;
+        this.completed = true;
+        localStorage.setItem('dbInitialized', 'true');
+        console.log('✅ Base de datos reinicializada correctamente');
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = 'Error al reinicializar la base de datos: ' + err.message;
+        console.error('Error:', err);
+      }
+    });
+  }
 }

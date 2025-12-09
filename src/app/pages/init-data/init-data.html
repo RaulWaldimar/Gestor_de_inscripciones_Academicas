@@ -11,10 +11,10 @@
         <p class="small-text">Se crearán:</p>
         <ul>
           <li>✅ 1 usuario Admin</li>
-          <li>✅ 5 docentes</li>
-          <li>✅ 20 estudiantes</li>
-          <li>✅ 5 cursos</li>
-          <li>✅ Matrículas automáticas</li>
+          <li>✅ 9 docentes (5 originales + 4 nuevos)</li>
+          <li>✅ 25 estudiantes (5 específicos con nombres)</li>
+          <li>✅ 9 cursos (5 originales + 4 nuevos)</li>
+          <li>✅ Matrículas automáticas respetando grado-sección</li>
         </ul>
         <button class="btn btn-primary" (click)="initializeDatabase()" [disabled]="loading">
           <span *ngIf="!loading">Inicializar Base de Datos</span>
@@ -63,6 +63,9 @@
           <button class="btn btn-warning" (click)="limpiarDuplicados()" [disabled]="cleaning">
             <span *ngIf="!cleaning">🧹 Limpiar Duplicados</span>
             <span *ngIf="cleaning"><span class="spinner"></span> Limpiando...</span>
+          </button>
+          <button class="btn btn-danger" (click)="reinicializarDatabase()">
+            🔄 Reinicializar Base de Datos
           </button>
         </div>
 
