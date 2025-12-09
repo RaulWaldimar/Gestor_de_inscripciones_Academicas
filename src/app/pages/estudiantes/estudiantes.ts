@@ -19,6 +19,10 @@ export class EstudiantesComponent implements OnInit {
   showForm = false;
   editandoId: string | null = null;
   buscador = '';
+  
+  // Paginación
+  paginaActual = 1;
+  registrosPorPagina = 5;
 
   estudianteForm!: FormGroup;
 
@@ -34,15 +38,41 @@ export class EstudiantesComponent implements OnInit {
 
   initForm(): void {
     this.estudianteForm = this.fb.group({
-      nombres: ['', [Validators.required, Validators.minLength(3)]],
-      apellidos: ['', [Validators.required, Validators.minLength(3)]],
-      emailInstitucional: ['', [Validators.required, Validators.email]],
+      nombres: ['', [
+        Validators.required, 
+        Validators.minLength(3),
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)
+      ]],
+      apellidos: ['', [
+        Validators.required, 
+        Validators.minLength(3),
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)
+      ]],
+      emailInstitucional: ['', [
+        Validators.required, 
+        Validators.email,
+        Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+      ]],
       nivel: ['', Validators.required],
       grado: ['', Validators.required],
-      seccion: ['', Validators.required],
+      seccion: ['', [
+        Validators.required,
+        Validators.pattern(/^[A-Za-z0-9]$/)
+      ]],
       fechaNacimiento: ['', Validators.required],
-      nombreApoderado: ['', Validators.required],
-      telefonoApoderado: ['', [Validators.required, Validators.minLength(9)]],
+      nombreApoderado: ['', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(100)
+      ]],
+      telefonoApoderado: ['', [
+        Validators.required, 
+        Validators.minLength(9),
+        Validators.maxLength(15),
+        Validators.pattern(/^[0-9]{9,15}$/)
+      ]],
       estado: ['activo', Validators.required]
     });
   }
@@ -125,5 +155,29 @@ export class EstudiantesComponent implements OnInit {
       e.apellidos.toLowerCase().includes(this.buscador.toLowerCase()) ||
       e.emailInstitucional.toLowerCase().includes(this.buscador.toLowerCase())
     );
+  }
+
+  get totalPaginas(): number {
+    return Math.ceil(this.estudiantesFiltrados.length / this.registrosPorPagina);
+  }
+
+  get estudiantesPaginados(): Estudiante[] {
+    const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
+    const fin = inicio + this.registrosPorPagina;
+    return this.estudiantesFiltrados.slice(inicio, fin);
+  }
+
+  irAPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPaginas) {
+      this.paginaActual = pagina;
+    }
+  }
+
+  siguientePagina(): void {
+    this.irAPagina(this.paginaActual + 1);
+  }
+
+  paginaAnterior(): void {
+    this.irAPagina(this.paginaActual - 1);
   }
 }

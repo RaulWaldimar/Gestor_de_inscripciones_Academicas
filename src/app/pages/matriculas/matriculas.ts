@@ -32,6 +32,10 @@ export class MatriculasComponent implements OnInit {
   showForm = false;
   buscador = '';
   filtroEstado = '';
+  
+  // Paginación
+  paginaActual = 1;
+  registrosPorPagina = 5;
 
   matriculaForm!: FormGroup;
 
@@ -180,5 +184,29 @@ export class MatriculasComponent implements OnInit {
         (m.nombreCurso?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false);
       return coincideEstado && coincideBusqueda;
     });
+  }
+
+  get totalPaginas(): number {
+    return Math.ceil(this.matriculasFiltradas.length / this.registrosPorPagina);
+  }
+
+  get matriculasPaginadas(): MatriculaConDatos[] {
+    const inicio = (this.paginaActual - 1) * this.registrosPorPagina;
+    const fin = inicio + this.registrosPorPagina;
+    return this.matriculasFiltradas.slice(inicio, fin);
+  }
+
+  irAPagina(pagina: number): void {
+    if (pagina >= 1 && pagina <= this.totalPaginas) {
+      this.paginaActual = pagina;
+    }
+  }
+
+  siguientePagina(): void {
+    this.irAPagina(this.paginaActual + 1);
+  }
+
+  paginaAnterior(): void {
+    this.irAPagina(this.paginaActual - 1);
   }
 }

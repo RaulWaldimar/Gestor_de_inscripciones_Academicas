@@ -98,9 +98,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let matricula of matriculasFiltradas">
-          <td>{{ matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId) }}</td>
-          <td>{{ matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId) }}</td>
+        <tr *ngFor="let matricula of matriculasPaginadas">
+          <td>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</td>
+          <td>{{ (matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId)) | titlecase }}</td>
           <td>{{ matricula.fechaInscripcion | safeDate }}</td>
           <td>
             <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
@@ -120,5 +120,19 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Paginación -->
+    <div *ngIf="totalPaginas > 1" class="pagination">
+      <button class="btn btn-sm" (click)="paginaAnterior()" [disabled]="paginaActual === 1">
+        ← Anterior
+      </button>
+      <span class="page-info">
+        Página {{ paginaActual }} de {{ totalPaginas }} 
+        ({{ matriculasFiltradas.length }} registros)
+      </span>
+      <button class="btn btn-sm" (click)="siguientePagina()" [disabled]="paginaActual === totalPaginas">
+        Siguiente →
+      </button>
+    </div>
   </div>
 </div>

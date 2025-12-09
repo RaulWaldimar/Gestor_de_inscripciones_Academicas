@@ -53,11 +53,21 @@ export class DocentePanelComponent implements OnInit {
       this.docenteService.obtenerDocentePorUid(this.usuario.uid).subscribe({
         next: (docente) => {
           this.docente = docente;
+          if (!docente || !docente.id) {
+            this.error = 'No tienes un perfil de docente asignado';
+            this.loading = false;
+            return;
+          }
+          
           // Cargar todos los cursos
           this.cursoService.obtenerCursos().subscribe({
             next: (cursos) => {
-              // Filtrar solo los cursos del docente actual
-              this.cursos = cursos.filter(c => c.docenteId === this.usuario?.uid);
+              // Filtrar solo los cursos del docente actual (comparar con docenteId del curso)
+              this.cursos = cursos.filter(c => c.docenteId === this.usuario?.uid || c.docenteId === docente.id);
+
+              console.log('📚 Cursos del docente:', this.cursos.length);
+              console.log('   UID usuario:', this.usuario?.uid);
+              console.log('   ID docente:', docente.id);
 
               if (this.cursos.length > 0) {
                 this.selectedCursoId = this.cursos[0].id || null;

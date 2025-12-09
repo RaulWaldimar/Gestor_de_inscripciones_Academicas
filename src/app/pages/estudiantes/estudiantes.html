@@ -25,21 +25,29 @@
           <label>Nombres *</label>
           <input type="text" formControlName="nombres" placeholder="Ingrese los nombres">
           <span *ngIf="estudianteForm.get('nombres')?.invalid && estudianteForm.get('nombres')?.touched" class="error">
-            Los nombres son requeridos (mínimo 3 caracteres)
+            <span *ngIf="estudianteForm.get('nombres')?.errors?.['required']">Los nombres son requeridos</span>
+            <span *ngIf="estudianteForm.get('nombres')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+            <span *ngIf="estudianteForm.get('nombres')?.errors?.['maxlength']">Máximo 50 caracteres</span>
+            <span *ngIf="estudianteForm.get('nombres')?.errors?.['pattern']">Solo se permiten letras y espacios</span>
           </span>
         </div>
         <div class="form-group">
           <label>Apellidos *</label>
           <input type="text" formControlName="apellidos" placeholder="Ingrese los apellidos">
           <span *ngIf="estudianteForm.get('apellidos')?.invalid && estudianteForm.get('apellidos')?.touched" class="error">
-            Los apellidos son requeridos (mínimo 3 caracteres)
+            <span *ngIf="estudianteForm.get('apellidos')?.errors?.['required']">Los apellidos son requeridos</span>
+            <span *ngIf="estudianteForm.get('apellidos')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+            <span *ngIf="estudianteForm.get('apellidos')?.errors?.['maxlength']">Máximo 50 caracteres</span>
+            <span *ngIf="estudianteForm.get('apellidos')?.errors?.['pattern']">Solo se permiten letras y espacios</span>
           </span>
         </div>
         <div class="form-group">
           <label>Email Institucional *</label>
           <input type="email" formControlName="emailInstitucional" placeholder="correo@cole.pe">
           <span *ngIf="estudianteForm.get('emailInstitucional')?.invalid && estudianteForm.get('emailInstitucional')?.touched" class="error">
-            Email inválido
+            <span *ngIf="estudianteForm.get('emailInstitucional')?.errors?.['required']">Email es requerido</span>
+            <span *ngIf="estudianteForm.get('emailInstitucional')?.errors?.['email']">Formato de email inválido</span>
+            <span *ngIf="estudianteForm.get('emailInstitucional')?.errors?.['pattern']">Email no válido</span>
           </span>
         </div>
         <div class="form-group">
@@ -81,7 +89,10 @@
           <label>Teléfono del Apoderado *</label>
           <input type="tel" formControlName="telefonoApoderado" placeholder="Número de teléfono">
           <span *ngIf="estudianteForm.get('telefonoApoderado')?.invalid && estudianteForm.get('telefonoApoderado')?.touched" class="error">
-            El teléfono es requerido (mínimo 9 dígitos)
+            <span *ngIf="estudianteForm.get('telefonoApoderado')?.errors?.['required']">Teléfono es requerido</span>
+            <span *ngIf="estudianteForm.get('telefonoApoderado')?.errors?.['minlength']">Mínimo 9 dígitos</span>
+            <span *ngIf="estudianteForm.get('telefonoApoderado')?.errors?.['maxlength']">Máximo 15 dígitos</span>
+            <span *ngIf="estudianteForm.get('telefonoApoderado')?.errors?.['pattern']">Solo se permiten números</span>
           </span>
         </div>
         <div class="form-group">
@@ -134,14 +145,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let estudiante of estudiantesFiltrados">
-          <td>{{ estudiante.nombres }}</td>
-          <td>{{ estudiante.apellidos }}</td>
-          <td>{{ estudiante.emailInstitucional }}</td>
+        <tr *ngFor="let estudiante of estudiantesPaginados">
+          <td>{{ estudiante.nombres | titlecase }}</td>
+          <td>{{ estudiante.apellidos | titlecase }}</td>
+          <td>{{ estudiante.emailInstitucional | lowercase }}</td>
           <td>{{ estudiante.nivel }}</td>
           <td>{{ estudiante.grado }}</td>
-          <td>{{ estudiante.seccion }}</td>
-          <td>{{ estudiante.nombreApoderado }}</td>
+          <td>{{ estudiante.seccion | uppercase }}</td>
+          <td>{{ estudiante.nombreApoderado | titlecase }}</td>
           <td>
             <span class="estado-badge" [ngClass]="'estado-' + estudiante.estado">
               {{ estudiante.estado | estadoEstudiante }}
@@ -154,5 +165,19 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Paginación -->
+    <div *ngIf="totalPaginas > 1" class="pagination">
+      <button class="btn btn-sm" (click)="paginaAnterior()" [disabled]="paginaActual === 1">
+        ← Anterior
+      </button>
+      <span class="page-info">
+        Página {{ paginaActual }} de {{ totalPaginas }} 
+        ({{ estudiantesFiltrados.length }} registros)
+      </span>
+      <button class="btn btn-sm" (click)="siguientePagina()" [disabled]="paginaActual === totalPaginas">
+        Siguiente →
+      </button>
+    </div>
   </div>
 </div>
