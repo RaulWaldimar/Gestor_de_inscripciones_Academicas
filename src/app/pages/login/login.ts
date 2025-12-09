@@ -17,6 +17,8 @@ export class LoginComponent implements OnInit {
   showRegister = false;
   loading = false;
   error: string | null = null;
+  success: string | null = null;
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -48,26 +50,30 @@ export class LoginComponent implements OnInit {
 
     this.loading = true;
     this.error = null;
+    this.success = null;
 
     const { email, password } = this.loginForm.value;
     this.authService.login(email, password).subscribe({
       next: (user) => {
         if (user) {
-          // Redirigir según el rol
-          if (user.rol === 'admin') {
-            this.router.navigate(['/admin-dashboard']);
-          } else if (user.rol === 'docente') {
-            this.router.navigate(['/docente']);
-          } else {
-            this.router.navigate(['/dashboard']);
-          }
+          this.success = '✓ Credenciales válidas. Ingresando al sistema...';
+          setTimeout(() => {
+            // Redirigir según el rol
+            if (user.rol === 'admin') {
+              this.router.navigate(['/admin-dashboard']);
+            } else if (user.rol === 'docente') {
+              this.router.navigate(['/docente']);
+            } else {
+              this.router.navigate(['/dashboard']);
+            }
+          }, 1500);
         } else {
-          this.error = 'Credenciales inválidas';
+          this.error = '✗ Credenciales inválidas. Intente de nuevo';
+          this.loading = false;
         }
-        this.loading = false;
       },
       error: (err) => {
-        this.error = this.getErrorMessage(err);
+        this.error = '✗ ' + this.getErrorMessage(err) + '. Intente de nuevo';
         this.loading = false;
       }
     });
@@ -78,22 +84,25 @@ export class LoginComponent implements OnInit {
 
     this.loading = true;
     this.error = null;
+    this.success = null;
 
     const { email, password, nombre, apellido, rol } = this.registerForm.value;
     this.authService.register(email, password, nombre, apellido, rol).subscribe({
       next: (user) => {
-        // Redirigir según el rol
-        if (user.rol === 'admin') {
-          this.router.navigate(['/admin-dashboard']);
-        } else if (user.rol === 'docente') {
-          this.router.navigate(['/docente']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
-        this.loading = false;
+        this.success = '✓ Registro exitoso. Ingresando al sistema...';
+        setTimeout(() => {
+          // Redirigir según el rol
+          if (user.rol === 'admin') {
+            this.router.navigate(['/admin-dashboard']);
+          } else if (user.rol === 'docente') {
+            this.router.navigate(['/docente']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
+        }, 1500);
       },
       error: (err) => {
-        this.error = this.getErrorMessage(err);
+        this.error = '✗ ' + this.getErrorMessage(err) + '. Intente de nuevo';
         this.loading = false;
       }
     });

@@ -236,28 +236,63 @@ export class SeedDataService {
     const cursosList = Object.entries(cursosIds);
     let matriculasCreadas = 0;
 
-    for (let i = 0; i < estudiantesIds.length; i++) {
-      const docId = estudiantesIds[i]; // Usar ID del documento
-      // Asignar 2-3 cursos aleatorios a cada estudiante
-      const numCursos = Math.floor(Math.random() * 2) + 2;
-      const cursosAsignados = new Set<number>();
-
-      while (cursosAsignados.size < numCursos && cursosAsignados.size < cursosList.length) {
-        cursosAsignados.add(Math.floor(Math.random() * cursosList.length));
+    // Primero, obtener datos de cursos para validar grado y sección
+    const cursosDataMap = new Map<string, any>();
+    for (const cursoData of cursosData) {
+      // Encontrar el ID del curso por nombre
+      const cursoId = cursosIds[cursoData.nombre];
+      if (cursoId) {
+        cursosDataMap.set(cursoId, cursoData);
       }
+    }
 
-      for (const cursoIndex of cursosAsignados) {
-        try {
-          await addDoc(collection(this.firestore, 'matriculas'), {
-            estudianteId: docId, // Usar ID del documento
-            cursoId: cursosList[cursoIndex][1],
-            estado: 'activa',
-            fechaInscripcion: new Date(),
-            calificacionFinal: null
-          });
-          matriculasCreadas++;
-        } catch (error) {
-          console.error('Error creando matrícula:', error);
+    // Obtener datos de estudiantes por ID para validar grado
+    const estudiantesDataMap = new Map<string, any>();
+    for (let i = 0; i < estudiantesData.length; i++) {
+      if (i < estudiantesIds.length) {
+        estudiantesDataMap.set(estudiantesIds[i], estudiantesData[i]);
+      }
+    }
+
+    for (let i = 0; i < estudiantesIds.length; i++) {
+      const docId = estudiantesIds[i];
+      const estudianteData = estudiantesDataMap.get(docId);
+      
+      if (!estudianteData) continue;
+
+      // Filtrar cursos que coincidan con el grado y sección del estudiante
+      const cursosCompatibles = cursosList.filter(([_, cursoId]) => {
+        const cursoData = cursosDataMap.get(cursoId);
+        return cursoData && 
+               cursoData.grado === estudianteData.grado && 
+               cursoData.seccion === estudianteData.seccion;
+      });
+
+      // Asignar 2-3 cursos compatibles a cada estudiante
+      if (cursosCompatibles.length > 0) {
+        const numCursos = Math.min(
+          Math.floor(Math.random() * 2) + 2,
+          cursosCompatibles.length
+        );
+        const cursosAsignados = new Set<number>();
+
+        while (cursosAsignados.size < numCursos) {
+          cursosAsignados.add(Math.floor(Math.random() * cursosCompatibles.length));
+        }
+
+        for (const cursoIndex of cursosAsignados) {
+          try {
+            await addDoc(collection(this.firestore, 'matriculas'), {
+              estudianteId: docId,
+              cursoId: cursosCompatibles[cursoIndex][1],
+              estado: 'activa',
+              fechaInscripcion: new Date(),
+              calificacionFinal: null
+            });
+            matriculasCreadas++;
+          } catch (error) {
+            console.error('Error creando matrícula:', error);
+          }
         }
       }
     }

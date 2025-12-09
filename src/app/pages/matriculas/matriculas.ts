@@ -115,8 +115,29 @@ export class MatriculasComponent implements OnInit {
   guardarMatricula(): void {
     if (this.matriculaForm.invalid) return;
 
-    this.loading = true;
     const dataMatricula = this.matriculaForm.value;
+    const estudiante = this.estudiantesMap.get(dataMatricula.estudianteId);
+    const curso = this.cursosMap.get(dataMatricula.cursoId);
+
+    // Validar que el estudiante existe
+    if (!estudiante) {
+      this.error = 'Estudiante no encontrado';
+      return;
+    }
+
+    // Validar que el curso existe
+    if (!curso) {
+      this.error = 'Curso no encontrado';
+      return;
+    }
+
+    // Validar que el grado y sección del estudiante coincidan con el curso
+    if (estudiante.grado !== curso.grado || estudiante.seccion !== curso.seccion) {
+      this.error = `El estudiante es del grado ${estudiante.grado} sección ${estudiante.seccion}, pero el curso es del grado ${curso.grado} sección ${curso.seccion}. No puede matricularse en este curso.`;
+      return;
+    }
+
+    this.loading = true;
     dataMatricula.fechaInscripcion = new Date();
     dataMatricula.calificacion = 0;
 
@@ -204,6 +225,28 @@ export class MatriculasComponent implements OnInit {
     return curso ? curso.nombre : 'Curso no encontrado';
   }
 
+  get cursosDisponibles(): Curso[] {
+    const estudianteId = this.matriculaForm.get('estudianteId')?.value;
+    if (!estudianteId) {
+      return [];
+    }
+    
+    const estudiante = this.estudiantesMap.get(estudianteId);
+    if (!estudiante) {
+      return [];
+    }
+
+    // Filtrar cursos que coincidan con grado y sección del estudiante
+    return this.cursos.filter(curso => 
+      curso.grado === estudiante.grado && curso.seccion === estudiante.seccion
+    );
+  }
+
+  get estudianteSeleccionado(): Estudiante | null {
+    const estudianteId = this.matriculaForm.get('estudianteId')?.value;
+    return estudianteId ? this.estudiantesMap.get(estudianteId) || null : null;
+  }
+
   get matriculasFiltradas(): MatriculaConDatos[] {
     return this.matriculas.filter(m => {
       const coincideEstado = this.filtroEstado === '' || m.estado === this.filtroEstado;
@@ -211,6 +254,25 @@ export class MatriculasComponent implements OnInit {
         (m.nombreEstudiante?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false) ||
         (m.nombreCurso?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false);
       return coincideEstado && coincideBusqueda;
+    });
+  }
+
+  get gradosUnicos(): string[] {
+    const grados = [...new Set(this.matriculasFiltradas.map(m => {
+      const estudiante = this.estudiantesMap.get(m.estudianteId);
+      return estudiante?.grado || '';
+    }).filter(g => g))];
+    return grados.sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+      const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+      return numA - numB;
+    });
+  }
+
+  obtenerMatriculasPorGrado(grado: string): MatriculaConDatos[] {
+    return this.matriculasFiltradas.filter(m => {
+      const estudiante = this.estudiantesMap.get(m.estudianteId);
+      return estudiante?.grado === grado;
     });
   }
 

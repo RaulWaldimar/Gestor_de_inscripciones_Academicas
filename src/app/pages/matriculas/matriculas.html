@@ -26,23 +26,34 @@
           <select formControlName="estudianteId">
             <option value="">-- Seleccionar estudiante --</option>
             <option *ngFor="let est of estudiantes" [value]="est.id!">
-              {{ est.nombres }} {{ est.apellidos }}
+              {{ est.nombres }} {{ est.apellidos }} (Grado {{ est.grado }} - Sec {{ est.seccion }})
             </option>
           </select>
           <span *ngIf="matriculaForm.get('estudianteId')?.invalid && matriculaForm.get('estudianteId')?.touched" class="error">
             Debe seleccionar un estudiante
           </span>
         </div>
+
+        <!-- Información del estudiante seleccionado -->
+        <div *ngIf="estudianteSeleccionado" class="info-box">
+          <strong>Estudiante seleccionado:</strong> {{ estudianteSeleccionado.nombres }} {{ estudianteSeleccionado.apellidos }}
+          <br>
+          <strong>Grado - Sección:</strong> {{ estudianteSeleccionado.grado }} - {{ estudianteSeleccionado.seccion }}
+        </div>
+
         <div class="form-group">
           <label>Curso *</label>
           <select formControlName="cursoId">
             <option value="">-- Seleccionar curso --</option>
-            <option *ngFor="let curso of cursos" [value]="curso.id">
+            <option *ngFor="let curso of cursosDisponibles" [value]="curso.id">
               {{ curso.nombre }} - Grado {{ curso.grado }} Sec {{ curso.seccion }}
             </option>
           </select>
           <span *ngIf="matriculaForm.get('cursoId')?.invalid && matriculaForm.get('cursoId')?.touched" class="error">
             Debe seleccionar un curso
+          </span>
+          <span *ngIf="estudianteSeleccionado && cursosDisponibles.length === 0" class="error">
+            No hay cursos disponibles para este estudiante
           </span>
         </div>
         <div class="form-group">
@@ -86,52 +97,59 @@
       <p>No hay matrículas disponibles</p>
     </div>
 
-    <table *ngIf="matriculasFiltradas.length > 0" class="matriculas-table">
-      <thead>
-        <tr>
-          <th>Estudiante</th>
-          <th>Curso</th>
-          <th>Fecha Inscripción</th>
-          <th>Estado</th>
-          <th>Calificación</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let matricula of matriculasPaginadas">
-          <td>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</td>
-          <td>{{ (matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId)) | titlecase }}</td>
-          <td>{{ matricula.fechaInscripcion | safeDate }}</td>
-          <td>
-            <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
-              {{ matricula.estado | estadoMatricula }}
-            </span>
-          </td>
-          <td>{{ matricula.calificacionFinal || 'Sin calificar' }}</td>
-          <td class="acciones">
-            <button 
-              *ngIf="matricula.estado === 'activa' && matricula.id"
-              class="btn btn-sm btn-delete" 
-              (click)="cancelarMatricula(matricula.id!)">
-              Cancelar
-            </button>
-            <button 
-              *ngIf="matricula.estado === 'cancelada' && matricula.id"
-              class="btn btn-sm btn-success" 
-              (click)="revertirCancelacion(matricula.id!)">
-              Reactivar
-            </button>
-            <button 
-              *ngIf="matricula.id"
-              class="btn btn-sm btn-danger" 
-              (click)="eliminarMatricula(matricula.id!)">
-              Eliminar
-            </button>
-            <span *ngIf="matricula.estado === 'completada'" class="text-muted">-</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Agrupado por Grado -->
+    <div *ngIf="matriculasFiltradas.length > 0" class="grados-container">
+      <div *ngFor="let grado of gradosUnicos" class="grado-section">
+        <h3 class="grado-header">Grado {{ grado }}</h3>
+        
+        <table class="matriculas-table">
+          <thead>
+            <tr>
+              <th>Estudiante</th>
+              <th>Curso</th>
+              <th>Fecha Inscripción</th>
+              <th>Estado</th>
+              <th>Calificación</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let matricula of obtenerMatriculasPorGrado(grado)">
+              <td>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</td>
+              <td>{{ (matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId)) | titlecase }}</td>
+              <td>{{ matricula.fechaInscripcion | safeDate }}</td>
+              <td>
+                <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
+                  {{ matricula.estado | estadoMatricula }}
+                </span>
+              </td>
+              <td>{{ matricula.calificacionFinal || 'Sin calificar' }}</td>
+              <td class="acciones">
+                <button 
+                  *ngIf="matricula.estado === 'activa' && matricula.id"
+                  class="btn btn-sm btn-delete" 
+                  (click)="cancelarMatricula(matricula.id!)">
+                  Cancelar
+                </button>
+                <button 
+                  *ngIf="matricula.estado === 'cancelada' && matricula.id"
+                  class="btn btn-sm btn-success" 
+                  (click)="revertirCancelacion(matricula.id!)">
+                  Reactivar
+                </button>
+                <button 
+                  *ngIf="matricula.id"
+                  class="btn btn-sm btn-danger" 
+                  (click)="eliminarMatricula(matricula.id!)">
+                  Eliminar
+                </button>
+                <span *ngIf="matricula.estado === 'completada'" class="text-muted">-</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <!-- Paginación -->
     <div *ngIf="totalPaginas > 1" class="pagination">
@@ -148,3 +166,4 @@
     </div>
   </div>
 </div>
+

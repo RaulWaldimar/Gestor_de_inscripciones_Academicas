@@ -27,12 +27,14 @@ export class App implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-        this.menuAbierto = false;
-      }
-    });
+    if (confirm('¿Deseas cerrar sesión?')) {
+      this.authService.logout().subscribe({
+        next: () => {
+          this.router.navigate(['/login']);
+          this.menuAbierto = false;
+        }
+      });
+    }
   }
 
   toggleMenu(): void {

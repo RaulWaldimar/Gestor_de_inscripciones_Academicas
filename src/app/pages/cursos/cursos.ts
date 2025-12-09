@@ -125,4 +125,17 @@ export class CursosComponent implements OnInit {
       c.grado.toLowerCase().includes(this.buscador.toLowerCase())
     );
   }
+
+  get gradosUnicos(): string[] {
+    const grados = [...new Set(this.cursosFiltrados.map(c => c.grado))];
+    return grados.sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+      const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+      return numA - numB;
+    });
+  }
+
+  obtenerCursosPorGrado(grado: string): Curso[] {
+    return this.cursosFiltrados.filter(c => c.grado === grado);
+  }
 }

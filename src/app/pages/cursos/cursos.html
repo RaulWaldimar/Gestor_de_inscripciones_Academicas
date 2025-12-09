@@ -125,34 +125,39 @@
       <p>No hay cursos disponibles</p>
     </div>
 
-    <table *ngIf="cursosFiltrados.length > 0" class="cursos-table">
-      <thead>
-        <tr>
-          <th>Nombre</th>
-          <th>Grado</th>
-          <th>Sección</th>
-          <th>Docente</th>
-          <th>Horario</th>
-          <th>Vacantes</th>
-          <th>Aula</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let curso of cursosFiltrados">
-          <td>{{ curso.nombre }}</td>
-          <td>{{ curso.grado }}</td>
-          <td>{{ curso.seccion }}</td>
-          <td>{{ curso.docenteNombre }}</td>
-          <td>{{ curso.horario }}</td>
-          <td>{{ curso.vacantes }}</td>
-          <td>{{ curso.aula }}</td>
-          <td class="acciones">
-            <button class="btn btn-sm btn-edit" (click)="editarCurso(curso)">Editar</button>
-            <button class="btn btn-sm btn-delete" (click)="eliminarCurso(curso.id!)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Agrupado por Grado -->
+    <div *ngIf="cursosFiltrados.length > 0" class="grados-container">
+      <div *ngFor="let grado of gradosUnicos" class="grado-section">
+        <h3 class="grado-header">Grado {{ grado }}</h3>
+        
+        <table class="cursos-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Sección</th>
+              <th>Docente</th>
+              <th>Horario</th>
+              <th>Vacantes</th>
+              <th>Aula</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let curso of obtenerCursosPorGrado(grado)">
+              <td>{{ curso.nombre }}</td>
+              <td class="seccion-badge">{{ curso.seccion }}</td>
+              <td>{{ curso.docenteNombre }}</td>
+              <td>{{ curso.horario }}</td>
+              <td>{{ curso.vacantes }}</td>
+              <td>{{ curso.aula }}</td>
+              <td class="acciones">
+                <button class="btn btn-sm btn-edit" (click)="editarCurso(curso)">Editar</button>
+                <button class="btn btn-sm btn-delete" (click)="eliminarCurso(curso.id!)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>

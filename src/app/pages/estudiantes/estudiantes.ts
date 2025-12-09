@@ -19,6 +19,7 @@ export class EstudiantesComponent implements OnInit {
   showForm = false;
   editandoId: string | null = null;
   buscador = '';
+  vistaGrupos = true; // Toggle entre vista por grados y vista completa
   
   // Paginación
   paginaActual = 1;
@@ -150,11 +151,28 @@ export class EstudiantesComponent implements OnInit {
   }
 
   get estudiantesFiltrados(): Estudiante[] {
+    const buscadorLower = this.buscador.toLowerCase();
     return this.estudiantes.filter(e =>
-      e.nombres.toLowerCase().includes(this.buscador.toLowerCase()) ||
-      e.apellidos.toLowerCase().includes(this.buscador.toLowerCase()) ||
-      e.emailInstitucional.toLowerCase().includes(this.buscador.toLowerCase())
+      e.nombres.toLowerCase().includes(buscadorLower) ||
+      e.apellidos.toLowerCase().includes(buscadorLower) ||
+      e.emailInstitucional.toLowerCase().includes(buscadorLower) ||
+      e.grado.toLowerCase().includes(buscadorLower) ||
+      e.seccion.toLowerCase().includes(buscadorLower)
     );
+  }
+
+  get gradosUnicos(): string[] {
+    const grados = [...new Set(this.estudiantesFiltrados.map(e => e.grado))];
+    return grados.sort((a, b) => {
+      // Ordenar grados numéricamente (1ro, 2do, 3ro, etc)
+      const numA = parseInt(a.match(/\d+/)?.[0] || '0');
+      const numB = parseInt(b.match(/\d+/)?.[0] || '0');
+      return numA - numB;
+    });
+  }
+
+  obtenerEstudiantesPorGrado(grado: string): Estudiante[] {
+    return this.estudiantesFiltrados.filter(e => e.grado === grado);
   }
 
   get totalPaginas(): number {

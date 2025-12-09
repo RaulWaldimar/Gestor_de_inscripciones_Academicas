@@ -141,10 +141,15 @@
 
 .search-bar {
   margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  align-items: stretch;
+  flex-wrap: wrap;
 }
 
 .search-input {
-  width: 100%;
+  flex: 1;
+  min-width: 250px;
   padding: 12px 15px;
   border: 2px solid #ddd;
   border-radius: 6px;
@@ -163,6 +168,44 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  background: white;
+  border-radius: 6px;
+  padding: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn {
+  padding: 10px 16px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background: #f0f0f0;
+  color: #333;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.toggle-btn:hover {
+  background: #e0e0e0;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
+.vista-completa {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -170,6 +213,44 @@
   font-size: 1.1rem;
   background: white;
   border-radius: 8px;
+}
+
+.grados-container {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.grado-section {
+  margin-bottom: 30px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.grado-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.seccion-badge {
+  font-weight: 700;
+  color: #667eea;
+  font-size: 0.9rem;
 }
 
 .estudiantes-table {

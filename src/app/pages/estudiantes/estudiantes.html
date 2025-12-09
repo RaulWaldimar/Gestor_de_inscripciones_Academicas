@@ -121,53 +121,107 @@
       <input
         type="text"
         class="search-input"
-        placeholder="Buscar por nombre, apellido o email..."
+        placeholder="Buscar por nombre, apellido, email o grado..."
         [(ngModel)]="buscador"
       />
+      <div class="view-toggle">
+        <button 
+          class="toggle-btn" 
+          [class.active]="vistaGrupos"
+          (click)="vistaGrupos = true">
+          📊 Por Grados
+        </button>
+        <button 
+          class="toggle-btn" 
+          [class.active]="!vistaGrupos"
+          (click)="vistaGrupos = false; paginaActual = 1">
+          📋 Vista Completa
+        </button>
+      </div>
     </div>
 
     <div *ngIf="estudiantesFiltrados.length === 0" class="empty-state">
       <p>No hay estudiantes disponibles</p>
     </div>
 
-    <table *ngIf="estudiantesFiltrados.length > 0" class="estudiantes-table">
-      <thead>
-        <tr>
-          <th>Nombres</th>
-          <th>Apellidos</th>
-          <th>Email</th>
-          <th>Nivel</th>
-          <th>Grado</th>
-          <th>Sección</th>
-          <th>Apoderado</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let estudiante of estudiantesPaginados">
-          <td>{{ estudiante.nombres | titlecase }}</td>
-          <td>{{ estudiante.apellidos | titlecase }}</td>
-          <td>{{ estudiante.emailInstitucional | lowercase }}</td>
-          <td>{{ estudiante.nivel }}</td>
-          <td>{{ estudiante.grado }}</td>
-          <td>{{ estudiante.seccion | uppercase }}</td>
-          <td>{{ estudiante.nombreApoderado | titlecase }}</td>
-          <td>
-            <span class="estado-badge" [ngClass]="'estado-' + estudiante.estado">
-              {{ estudiante.estado | estadoEstudiante }}
-            </span>
-          </td>
-          <td class="acciones">
-            <button class="btn btn-sm btn-edit" (click)="editarEstudiante(estudiante)">Editar</button>
-            <button class="btn btn-sm btn-delete" (click)="eliminarEstudiante(estudiante.id!)">Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Vista por Grados -->
+    <div *ngIf="vistaGrupos && estudiantesFiltrados.length > 0" class="grados-container">
+      <div *ngFor="let grado of gradosUnicos" class="grado-section">
+        <h3 class="grado-header">Grado {{ grado }}</h3>
+        
+        <table class="estudiantes-table">
+          <thead>
+            <tr>
+              <th>Nombres</th>
+              <th>Apellidos</th>
+              <th>Email</th>
+              <th>Sección</th>
+              <th>Apoderado</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let estudiante of obtenerEstudiantesPorGrado(grado)">
+              <td>{{ estudiante.nombres | titlecase }}</td>
+              <td>{{ estudiante.apellidos | titlecase }}</td>
+              <td>{{ estudiante.emailInstitucional | lowercase }}</td>
+              <td class="seccion-badge">{{ estudiante.seccion | uppercase }}</td>
+              <td>{{ estudiante.nombreApoderado | titlecase }}</td>
+              <td>
+                <span class="estado-badge" [ngClass]="'estado-' + estudiante.estado">
+                  {{ estudiante.estado | estadoEstudiante }}
+                </span>
+              </td>
+              <td class="acciones">
+                <button class="btn btn-sm btn-edit" (click)="editarEstudiante(estudiante)">Editar</button>
+                <button class="btn btn-sm btn-delete" (click)="eliminarEstudiante(estudiante.id!)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-    <!-- Paginación -->
-    <div *ngIf="totalPaginas > 1" class="pagination">
+    <!-- Vista Completa con Paginación -->
+    <div *ngIf="!vistaGrupos && estudiantesFiltrados.length > 0" class="vista-completa">
+      <table class="estudiantes-table">
+        <thead>
+          <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th>Grado</th>
+            <th>Sección</th>
+            <th>Apoderado</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let estudiante of estudiantesPaginados">
+            <td>{{ estudiante.nombres | titlecase }}</td>
+            <td>{{ estudiante.apellidos | titlecase }}</td>
+            <td>{{ estudiante.emailInstitucional | lowercase }}</td>
+            <td><strong>{{ estudiante.grado }}</strong></td>
+            <td class="seccion-badge">{{ estudiante.seccion | uppercase }}</td>
+            <td>{{ estudiante.nombreApoderado | titlecase }}</td>
+            <td>
+              <span class="estado-badge" [ngClass]="'estado-' + estudiante.estado">
+                {{ estudiante.estado | estadoEstudiante }}
+              </span>
+            </td>
+            <td class="acciones">
+              <button class="btn btn-sm btn-edit" (click)="editarEstudiante(estudiante)">Editar</button>
+              <button class="btn btn-sm btn-delete" (click)="eliminarEstudiante(estudiante.id!)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación - Solo para vista completa -->
+    <div *ngIf="!vistaGrupos && totalPaginas > 1" class="pagination">
       <button class="btn btn-sm" (click)="paginaAnterior()" [disabled]="paginaActual === 1">
         ← Anterior
       </button>
