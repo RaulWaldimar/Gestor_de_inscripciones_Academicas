@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InitService } from '../../services/init.service';
-import { CleanupService } from '../../services/cleanup.service';
+import { Router } from '@angular/router';
+import { Firestore, collection, getDocs } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-init-data',
@@ -14,93 +15,89 @@ export class InitDataComponent implements OnInit {
   loading = false;
   completed = false;
   error: string | null = null;
+  verificandoDatos = true;
   cleaning = false;
-  cleaningResults: { eliminados: number; errores: number } | null = null;
+  cleaningResults: any = null;
+  datosYaExisten = false;
 
   constructor(
     private initService: InitService,
-    private cleanupService: CleanupService
+    private router: Router,
+    private firestore: Firestore
   ) {}
 
   ngOnInit(): void {
-    // Verificar si ya se inicializó
-    const initialized = localStorage.getItem('dbInitialized');
-    if (initialized === 'true') {
-      this.completed = true;
+    this.verificarDatosExistentes();
+  }
+
+  async verificarDatosExistentes(): Promise<void> {
+    try {
+      this.verificandoDatos = true;
+      
+      // Verificar si existe la colección usuarios
+      const usuariosSnap = await getDocs(collection(this.firestore, 'usuarios'));
+      
+      if (usuariosSnap.docs.length > 0) {
+        // Datos ya existen
+        this.datosYaExisten = true;
+        this.completed = true;
+        this.verificandoDatos = false;
+        console.log('✅ Datos ya existen en Firestore');
+      } else {
+        // No hay datos, mostrar opción de cargar
+        this.datosYaExisten = false;
+        this.verificandoDatos = false;
+        console.log('ℹ️ Firestore vacío, listo para cargar datos');
+      }
+    } catch (error) {
+      console.error('Error verificando datos:', error);
+      this.verificandoDatos = false;
+      this.datosYaExisten = false;
     }
   }
 
   initializeDatabase(): void {
     this.loading = true;
     this.error = null;
+    this.verificandoDatos = true;
 
-    this.initService.inicializarDatos().subscribe({
+    this.initService.insertarDatosCompletos().subscribe({
       next: () => {
         this.loading = false;
         this.completed = true;
+        this.verificandoDatos = false;
         localStorage.setItem('dbInitialized', 'true');
-        console.log('✅ Base de datos inicializada correctamente');
+        
+        // Redirigir al login después de 2 segundos
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.loading = false;
-        this.error = 'Error al inicializar la base de datos: ' + err.message;
+        this.verificandoDatos = false;
+        this.error = 'Error: ' + (err.message || 'Error desconocido');
         console.error('Error:', err);
       }
     });
+  }
+
+  continuar(): void {
+    // Redirigir directamente al login
+    this.router.navigate(['/login']);
   }
 
   limpiarDuplicados(): void {
-    if (!confirm('⚠️ Esto eliminará todos los duplicados (cuentas con tildes y cursos duplicados). ¿Estás seguro?')) {
-      return;
-    }
-
     this.cleaning = true;
-    this.error = null;
     this.cleaningResults = null;
-
-    this.cleanupService.limpiarDuplicados().subscribe({
-      next: (results) => {
-        this.cleaning = false;
-        this.cleaningResults = results;
-        console.log(`✅ Limpieza completada: ${results.eliminados} eliminados, ${results.errores} errores`);
-      },
-      error: (err) => {
-        this.cleaning = false;
-        this.error = 'Error durante la limpieza: ' + err.message;
-        console.error('Error:', err);
-      }
-    });
+    // TODO: Implementar limpieza de duplicados
+    this.cleaning = false;
   }
 
   reinicializarDatabase(): void {
-    if (!confirm('⚠️ Esto borrará todos los datos y volverá a crear la base de datos desde cero. ¿Estás COMPLETAMENTE seguro?')) {
-      return;
+    if (confirm('¿Estás seguro? Esto eliminará todos los datos.')) {
+      this.completed = false;
+      this.initializeDatabase();
     }
-
-    if (!confirm('🚨 ÚLTIMA CONFIRMACIÓN: Se perderán todos los datos. ¿Continuar?')) {
-      return;
-    }
-
-    // Limpiar localStorage
-    localStorage.removeItem('dbInitialized');
-    
-    // Reiniciar la inicialización
-    this.loading = true;
-    this.error = null;
-    this.completed = false;
-
-    this.initService.inicializarDatos().subscribe({
-      next: () => {
-        this.loading = false;
-        this.completed = true;
-        localStorage.setItem('dbInitialized', 'true');
-        console.log('✅ Base de datos reinicializada correctamente');
-      },
-      error: (err) => {
-        this.loading = false;
-        this.error = 'Error al reinicializar la base de datos: ' + err.message;
-        console.error('Error:', err);
-      }
-    });
   }
 }

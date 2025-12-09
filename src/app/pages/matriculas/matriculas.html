@@ -78,6 +78,22 @@
 
   <!-- Lista de Matrículas -->
   <div *ngIf="!showForm && !loading && !error" class="matriculas-section">
+    <!-- Tabs de Vista -->
+    <div class="view-tabs">
+      <button 
+        class="tab-button" 
+        [class.active]="vistaActual === 'general'"
+        (click)="vistaActual = 'general'">
+        📊 Vista General
+      </button>
+      <button 
+        class="tab-button" 
+        [class.active]="vistaActual === 'grados'"
+        (click)="vistaActual = 'grados'">
+        🎓 Por Grados
+      </button>
+    </div>
+
     <div class="filters">
       <input
         type="text"
@@ -97,15 +113,73 @@
       <p>No hay matrículas disponibles</p>
     </div>
 
-    <!-- Agrupado por Grado -->
-    <div *ngIf="matriculasFiltradas.length > 0" class="grados-container">
+    <!-- VISTA GENERAL -->
+    <div *ngIf="vistaActual === 'general' && matriculasFiltradas.length > 0" class="vista-general">
+      <table class="matriculas-table">
+        <thead>
+          <tr>
+            <th>Estudiante</th>
+            <th>Grado</th>
+            <th>Curso</th>
+            <th>Fecha Inscripción</th>
+            <th>Estado</th>
+            <th>Calificación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let matricula of matriculasFiltradas">
+            <td>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</td>
+            <td>
+              <span class="grado-badge">{{ obtenerGradoEstudiante(matricula.estudianteId) }}</span>
+            </td>
+            <td>{{ (matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId)) | titlecase }}</td>
+            <td>{{ matricula.fechaInscripcion | safeDate }}</td>
+            <td>
+              <span class="estado-badge" [ngClass]="'estado-' + matricula.estado">
+                {{ matricula.estado | estadoMatricula }}
+              </span>
+            </td>
+            <td>{{ matricula.calificacionFinal || 'Sin calificar' }}</td>
+            <td class="acciones">
+              <button 
+                *ngIf="matricula.estado === 'activa' && matricula.id"
+                class="btn btn-sm btn-delete" 
+                (click)="cancelarMatricula(matricula.id!)">
+                Cancelar
+              </button>
+              <button 
+                *ngIf="matricula.estado === 'cancelada' && matricula.id"
+                class="btn btn-sm btn-success" 
+                (click)="revertirCancelacion(matricula.id!)">
+                Reactivar
+              </button>
+              <button 
+                *ngIf="matricula.id"
+                class="btn btn-sm btn-danger" 
+                (click)="eliminarMatricula(matricula.id!)">
+                Eliminar
+              </button>
+              <span *ngIf="matricula.estado === 'completada'" class="text-muted">-</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- VISTA POR GRADOS -->
+    <div *ngIf="vistaActual === 'grados' && matriculasFiltradas.length > 0" class="vista-grados">
       <div *ngFor="let grado of gradosUnicos" class="grado-section">
-        <h3 class="grado-header">Grado {{ grado }}</h3>
+        <div class="grado-header-card">
+          <h3>📚 GRADO {{ grado }}</h3>
+          <span class="grado-count">{{ obtenerMatriculasPorGrado(grado).length }} matrículas</span>
+        </div>
         
         <table class="matriculas-table">
           <thead>
             <tr>
               <th>Estudiante</th>
+              <th>Sección</th>
               <th>Curso</th>
               <th>Fecha Inscripción</th>
               <th>Estado</th>
@@ -115,7 +189,10 @@
           </thead>
           <tbody>
             <tr *ngFor="let matricula of obtenerMatriculasPorGrado(grado)">
-              <td>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</td>
+              <td><strong>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</strong></td>
+              <td>
+                <span class="seccion-badge">{{ obtenerSeccionEstudiante(matricula.estudianteId) }}</span>
+              </td>
               <td>{{ (matricula.nombreCurso || obtenerNombreCurso(matricula.cursoId)) | titlecase }}</td>
               <td>{{ matricula.fechaInscripcion | safeDate }}</td>
               <td>

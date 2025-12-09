@@ -1,11 +1,11 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyDemoKey123456789",
-    authDomain: "gestor-inscripciones.firebaseapp.com",
-    projectId: "gestor-inscripciones",
-    storageBucket: "gestor-inscripciones.appspot.com",
-    messagingSenderId: "123456789000",
-    appId: "1:123456789000:web:abcdef123456789"
+    apiKey: "AIzaSyCOLQn_4RxXMvQhhlXBKjC1K-2pk-TvxIA",
+    authDomain: "gestor-inscripciones-760ca.firebaseapp.com",
+    projectId: "gestor-inscripciones-760ca",
+    storageBucket: "gestor-inscripciones-760ca.firebasestorage.app",
+    messagingSenderId: "860981727874",
+    appId: "1:860981727874:web:34ca444b1ef0d306339a9b"
   }
 };

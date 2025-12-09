@@ -33,6 +33,9 @@ export class MatriculasComponent implements OnInit {
   buscador = '';
   filtroEstado = '';
   
+  // Vista
+  vistaActual: 'general' | 'grados' = 'general';
+  
   // Paginación
   paginaActual = 1;
   registrosPorPagina = 5;
@@ -274,6 +277,16 @@ export class MatriculasComponent implements OnInit {
       const estudiante = this.estudiantesMap.get(m.estudianteId);
       return estudiante?.grado === grado;
     });
+  }
+
+  obtenerGradoEstudiante(estudianteId: string): string {
+    const estudiante = this.estudiantesMap.get(estudianteId);
+    return estudiante?.grado || 'N/A';
+  }
+
+  obtenerSeccionEstudiante(estudianteId: string): string {
+    const estudiante = this.estudiantesMap.get(estudianteId);
+    return estudiante?.seccion || 'N/A';
   }
 
   get totalPaginas(): number {

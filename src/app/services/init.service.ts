@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, setDoc, doc, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, setDoc, doc, getDocs, query, where } from '@angular/fire/firestore';
 import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
 import { from, Observable } from 'rxjs';
 
@@ -9,322 +9,306 @@ import { from, Observable } from 'rxjs';
 export class InitService {
   constructor(private firestore: Firestore, private auth: Auth) {}
 
-  inicializarDatos(): Observable<void> {
-    return from(this.seedCompleto());
+  insertarDatosCompletos(): Observable<void> {
+    return from(this.insertarDatos());
   }
 
-  private async seedCompleto(): Promise<void> {
+  private async insertarDatos(): Promise<void> {
     try {
-      console.log('🔄 Iniciando inicialización completa...');
+      console.log('🚀 Iniciando inserción completa de datos...');
 
-      // 1. Crear Admin
-      await this.crearAdmin();
+      // VERIFICAR SI LOS DATOS YA EXISTEN
+      const usuariosSnap = await getDocs(collection(this.firestore, 'usuarios'));
+      
+      if (usuariosSnap.docs.length > 0) {
+        console.log('ℹ️ ⚠️ Los datos ya existen en Firestore. No se cargarán datos duplicados.');
+        console.log(`✅ Se encontraron ${usuariosSnap.docs.length} usuarios existentes.`);
+        console.log('═══════════════════════════════════════════════════════');
+        console.log('✅✅✅ ¡BASE DE DATOS YA INICIALIZADA! ✅✅✅');
+        console.log('═══════════════════════════════════════════════════════');
+        return; // Salir sin cargar más datos
+      }
 
-      // 2. Crear Docentes
-      const docentesUIDs = await this.crearDocentes();
+      // 1. CREAR ADMIN (Solo en usuarios)
+      console.log('1️⃣ Creando Admin...');
+      const adminEmail = 'admin@cole.pe';
+      const adminPassword = 'Admin123!';
+      let adminUid = '';
 
-      // 3. Crear Cursos
-      const cursosIds = await this.crearCursos(docentesUIDs);
-
-      // 4. Crear Estudiantes
-      const estudiantesIds = await this.crearEstudiantes();
-
-      // 5. Crear Matrículas
-      await this.crearMatriculas(estudiantesIds, Object.values(cursosIds));
-
-      console.log('✅ Base de datos inicializada correctamente');
-    } catch (error) {
-      console.error('❌ Error en inicialización:', error);
-      throw error;
-    }
-  }
-
-  private async crearAdmin(): Promise<void> {
-    try {
-      const userCred = await createUserWithEmailAndPassword(this.auth, 'admin@cole.pe', 'Admin123!');
-      const uid = userCred.user.uid;
-
-      await setDoc(doc(this.firestore, 'usuarios', uid), {
+      try {
+        const adminAuth = await createUserWithEmailAndPassword(this.auth, adminEmail, adminPassword);
+        adminUid = adminAuth.user.uid;
+        } catch (error: any) {
+          if (error.code === 'auth/email-already-in-use') {
+            console.log('ℹ️ Admin ya existe en Auth');
+            // Obtener el UID real del documento existente en Firestore
+            const adminDoc = await getDocs(query(collection(this.firestore, 'usuarios'), where('email', '==', adminEmail)));
+            if (adminDoc.docs.length > 0) {
+              adminUid = adminDoc.docs[0].data()['uid'];
+              console.log('✅ UID encontrado:', adminUid);
+            } else {
+              // Si no existe en Firestore, usar el ID del documento como UID
+              adminUid = adminDoc.docs[0].id;
+            }
+          }
+        }      // Guardar admin solo en usuarios (NO en otras tablas)
+      await setDoc(doc(this.firestore, 'usuarios', adminUid), {
         nombre: 'Wal',
         apellido: 'Admin',
-        email: 'admin@cole.pe',
+        email: adminEmail,
         rol: 'admin',
-        uid: uid,
+        uid: adminUid,
         fechaCreacion: new Date()
       });
+      console.log('✅ Admin creado:', adminUid);
 
-      console.log('✅ Admin creado: admin@cole.pe');
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        console.log('ℹ️ Admin ya existe');
-      } else {
-        throw error;
-      }
-    }
-  }
+      // 2. CREAR 5 DOCENTES
+      console.log('2️⃣ Creando 5 Docentes...');
+      const docentesData = [
+        { nombres: 'Fabric', apellidos: 'Alferez Ramos', email: 'fabric@cole.pe', asignatura: 'Matemática', grados: ['3ro', '4to', '5to'] },
+        { nombres: 'Ana', apellidos: 'Flores Torres', email: 'ana@cole.pe', asignatura: 'Comunicacion', grados: ['3ro', '4to', '5to'] },
+        { nombres: 'Carlis', apellidos: 'Huaman Delgado', email: 'carlis@cole.pe', asignatura: 'Ciencia y Ambiente', grados: ['3ro', '4to'] },
+        { nombres: 'Julian', apellidos: 'Fuentes Tulipanes', email: 'julian@cole.pe', asignatura: 'Historia', grados: ['3ro', '4to', '5to'] },
+        { nombres: 'Jorge', apellidos: 'Salvatierra Perez', email: 'jorge@cole.pe', asignatura: 'Ingles', grados: ['3ro', '4to', '5to'] }
+      ];
 
-  private async crearDocentes(): Promise<{ [key: string]: string }> {
-    const docentesData = [
-      { nombres: 'Fabric', apellidos: 'Alferez Ramos', email: 'fabric@cole.pe', asignatura: 'Matematica' },
-      { nombres: 'Ana', apellidos: 'Flores Torres', email: 'ana@cole.pe', asignatura: 'Comunicacion' },
-      { nombres: 'Carlis', apellidos: 'Huaman Delgado', email: 'carlis@cole.pe', asignatura: 'Ciencia y Ambiente' },
-      { nombres: 'Julian', apellidos: 'Fuentes Tulipanes', email: 'julian@cole.pe', asignatura: 'Historia' },
-      { nombres: 'Jorge', apellidos: 'Salvatierra Perez', email: 'jorge@cole.pe', asignatura: 'Ingles' },
-      // Nuevos docentes
-      { nombres: 'Carlos', apellidos: 'Mendoza Gonzalez', email: 'carlos.mendoza@cole.pe', asignatura: 'Natacion' },
-      { nombres: 'Patricia', apellidos: 'Ramirez Vasquez', email: 'patricia.ramirez@cole.pe', asignatura: 'Aritmetica' },
-      { nombres: 'Roberto', apellidos: 'Silva Morales', email: 'roberto.silva@cole.pe', asignatura: 'Personal Social' },
-      { nombres: 'Maria', apellidos: 'Gutierrez Lopez', email: 'maria.gutierrez@cole.pe', asignatura: 'Geografia' }
-    ];
+      const docentesUIDs: { [key: string]: string } = {};
 
-    const docentesUIDs: { [key: string]: string } = {};
-    let docentesCreados = 0;
-
-    for (const docente of docentesData) {
-      try {
-        const userCred = await createUserWithEmailAndPassword(this.auth, docente.email, 'Docente123!');
-        const uid = userCred.user.uid;
-        docentesUIDs[docente.email] = uid;
-
-        // Guardar en usuarios
-        await setDoc(doc(this.firestore, 'usuarios', uid), {
-          nombre: docente.nombres,
-          apellido: docente.apellidos,
-          email: docente.email,
-          rol: 'docente',
-          uid: uid,
-          fechaCreacion: new Date()
-        });
-
-        // Guardar en docentes
-        await addDoc(collection(this.firestore, 'docentes'), {
-          nombres: docente.nombres,
-          apellidos: docente.apellidos,
-          emailInstitucional: docente.email,
-          telefono: '999999999',
-          nivel: 'Secundaria',
-          gradoAsignado: this.getGradosAsignados(docente.asignatura),
-          fechaContratacion: new Date(),
-          estado: 'activo',
-          uid: uid
-        });
-
-        docentesCreados++;
-        console.log(`✅ Docente creado: ${docente.nombres} ${docente.apellidos} (${docente.email})`);
-      } catch (error: any) {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log(`ℹ️ Docente ya existe: ${docente.email}`);
-          // Si ya existe, obtener el UID del documento de docentes
-          const docentesSnap = await getDocs(collection(this.firestore, 'docentes'));
-          const docenteExistente = docentesSnap.docs.find(d => d.data()['emailInstitucional'] === docente.email);
-          if (docenteExistente) {
-            const docData = docenteExistente.data();
-            docentesUIDs[docente.email] = docData['uid'];
+      for (const docenteData of docentesData) {
+        try {
+          let uid = '';
+          try {
+            const docenteAuth = await createUserWithEmailAndPassword(this.auth, docenteData.email, 'Docente123!');
+            uid = docenteAuth.user.uid;
+          } catch (error: any) {
+            if (error.code === 'auth/email-already-in-use') {
+              console.log(`ℹ️ Docente ${docenteData.email} ya existe en Auth`);
+              // Obtener el UID real del documento existente
+              const docenteDoc = await getDocs(query(collection(this.firestore, 'usuarios'), where('email', '==', docenteData.email)));
+              if (docenteDoc.docs.length > 0) {
+                uid = docenteDoc.docs[0].data()['uid'];
+                console.log(`✅ UID docente encontrado: ${uid}`);
+              }
+            }
           }
-        } else {
-          console.error(`Error creando docente ${docente.email}:`, error);
+
+          // Guardar en usuarios
+          await setDoc(doc(this.firestore, 'usuarios', uid), {
+            nombre: docenteData.nombres,
+            apellido: docenteData.apellidos,
+            email: docenteData.email,
+            rol: 'docente',
+            uid: uid,
+            fechaCreacion: new Date()
+          });
+
+          // Guardar en docentes
+          await setDoc(doc(this.firestore, 'docentes', uid), {
+            nombres: docenteData.nombres,
+            apellidos: docenteData.apellidos,
+            emailInstitucional: docenteData.email,
+            telefono: '987654321',
+            nivel: 'Secundaria',
+            gradoAsignado: docenteData.grados,
+            fechaContratacion: new Date(),
+            estado: 'activo',
+            uid: uid
+          });
+
+          docentesUIDs[docenteData.email] = uid;
+          console.log(`✅ Docente: ${docenteData.nombres} ${docenteData.apellidos}`);
+        } catch (error) {
+          console.error(`❌ Error docente ${docenteData.email}:`, error);
         }
       }
-    }
+      console.log(`✅ Total docentes: ${Object.keys(docentesUIDs).length}/5`);
 
-    console.log(`✅ Total docentes: ${docentesCreados}`);
-    return docentesUIDs;
-  }
+      // 3. CREAR 5 CURSOS
+      console.log('3️⃣ Creando 5 Cursos...');
+      const cursosData = [
+        { nombre: 'Matemática', grado: '4to', seccion: 'B', docente: 'fabric@cole.pe' },
+        { nombre: 'Comunicacion', grado: '4to', seccion: 'A', docente: 'ana@cole.pe' },
+        { nombre: 'Ciencia y Ambiente', grado: '3ro', seccion: 'A', docente: 'carlis@cole.pe' },
+        { nombre: 'Historia', grado: '4to', seccion: 'B', docente: 'julian@cole.pe' },
+        { nombre: 'Ingles', grado: '5to', seccion: 'A', docente: 'jorge@cole.pe' }
+      ];
 
-  private async crearCursos(docentesUIDs: { [key: string]: string }): Promise<{ [key: string]: string }> {
-    const cursosData = [
-      // Cursos originales (5to grado)
-      { nombre: 'Matematica', docente: 'fabric@cole.pe', grado: '5to', seccion: 'A', horario: 'Lunes 8:00 - 10:00', aula: 'Aula 301' },
-      { nombre: 'Comunicacion', docente: 'ana@cole.pe', grado: '5to', seccion: 'A', horario: 'Martes 10:00 - 12:00', aula: 'Aula 302' },
-      { nombre: 'Ciencia y Ambiente', docente: 'carlis@cole.pe', grado: '5to', seccion: 'A', horario: 'Miercoles 8:00 - 10:00', aula: 'Aula 303' },
-      { nombre: 'Historia', docente: 'julian@cole.pe', grado: '5to', seccion: 'A', horario: 'Jueves 10:00 - 12:00', aula: 'Aula 304' },
-      { nombre: 'Ingles', docente: 'jorge@cole.pe', grado: '5to', seccion: 'A', horario: 'Viernes 10:00 - 12:00', aula: 'Aula 305' },
-      // Nuevos cursos (1ro y 2do grado)
-      { nombre: 'Natacion', docente: 'carlos.mendoza@cole.pe', grado: '1ro', seccion: 'A', horario: 'Lunes 14:00 - 15:30', aula: 'Piscina' },
-      { nombre: 'Aritmetica', docente: 'patricia.ramirez@cole.pe', grado: '1ro', seccion: 'B', horario: 'Martes 14:00 - 15:30', aula: 'Aula 101' },
-      { nombre: 'Personal Social', docente: 'roberto.silva@cole.pe', grado: '2do', seccion: 'A', horario: 'Miercoles 14:00 - 15:30', aula: 'Aula 201' },
-      { nombre: 'Geografia', docente: 'maria.gutierrez@cole.pe', grado: '2do', seccion: 'B', horario: 'Jueves 14:00 - 15:30', aula: 'Aula 202' }
-    ];
+      const cursosIds: { [key: string]: string } = {};
+      let cursoIndex = 1;
 
-    const cursosIds: { [key: string]: string } = {};
-    let cursosCreados = 0;
-
-    for (const cursoData of cursosData) {
-      try {
-        const docenteId = docentesUIDs[cursoData.docente];
-        if (!docenteId) {
-          console.error(`No se encontró UID para docente ${cursoData.docente}`);
-          continue;
+      for (const cursoData of cursosData) {
+        try {
+          const docenteId = docentesUIDs[cursoData.docente];
+          const cursoRef = await addDoc(collection(this.firestore, 'cursos'), {
+            nombre: cursoData.nombre,
+            descripcion: `Curso de ${cursoData.nombre} para el grado ${cursoData.grado} ${cursoData.seccion}`,
+            grado: cursoData.grado,
+            seccion: cursoData.seccion,
+            nivel: 'Secundaria',
+            horario: `Lunes 8:00 – ${9 + cursoIndex}:00`,
+            vacantes: 40,
+            docenteNombre: docentesData.find(d => d.email === cursoData.docente)?.nombres || '',
+            docenteId: docenteId,
+            aula: `Aula ${200 + cursoIndex}`,
+            anioAcademico: '2025',
+            fechaCreacion: new Date()
+          });
+          cursosIds[cursoData.nombre] = cursoRef.id;
+          console.log(`✅ Curso: ${cursoData.nombre} (${cursoData.grado}/${cursoData.seccion})`);
+          cursoIndex++;
+        } catch (error) {
+          console.error(`❌ Error curso ${cursoData.nombre}:`, error);
         }
-
-        const cursoRef = await addDoc(collection(this.firestore, 'cursos'), {
-          nombre: cursoData.nombre,
-          descripcion: `Curso de ${cursoData.nombre}`,
-          grado: cursoData.grado,
-          seccion: cursoData.seccion,
-          nivel: 'Secundaria',
-          horario: cursoData.horario,
-          vacantes: 40,
-          docenteNombre: `${cursosData.find(c => c.nombre === cursoData.nombre)?.nombre || ''}`,
-          docenteId: docenteId,
-          aula: cursoData.aula,
-          anioAcademico: '2025',
-          fechaCreacion: new Date(),
-          inscritos: 0
-        });
-
-        cursosIds[cursoData.nombre] = cursoRef.id;
-        cursosCreados++;
-        console.log(`✅ Curso creado: ${cursoData.nombre} -> ${cursoRef.id}`);
-      } catch (error) {
-        console.error(`Error creando curso ${cursoData.nombre}:`, error);
       }
-    }
+      console.log(`✅ Total cursos: ${Object.keys(cursosIds).length}/5`);
 
-    console.log(`✅ Total cursos: ${cursosCreados}`);
-    return cursosIds;
-  }
+      // 4. CREAR 20 ESTUDIANTES
+      console.log('4️⃣ Creando 20 Estudiantes...');
+      const estudiantesData = [
+        { nombres: 'Juanito', apellidos: 'Quispe López', grado: '4to', seccion: 'A', apoderado: 'Jefferson López', telefono: '984123456' },
+        { nombres: 'Maria', apellidos: 'Garcia Rodriguez', grado: '4to', seccion: 'A', apoderado: 'Carlos Garcia', telefono: '984123457' },
+        { nombres: 'Carlos', apellidos: 'Martinez Flores', grado: '4to', seccion: 'B', apoderado: 'Pedro Martinez', telefono: '984123458' },
+        { nombres: 'Ana', apellidos: 'Lopez Sanchez', grado: '4to', seccion: 'B', apoderado: 'Juan Lopez', telefono: '984123459' },
+        { nombres: 'Miguel', apellidos: 'Hernandez Torres', grado: '3ro', seccion: 'A', apoderado: 'Jorge Hernandez', telefono: '984123460' },
+        { nombres: 'Sophia', apellidos: 'Ruiz Mendez', grado: '3ro', seccion: 'A', apoderado: 'Ricardo Ruiz', telefono: '984123461' },
+        { nombres: 'Lucas', apellidos: 'Diaz Peres', grado: '3ro', seccion: 'B', apoderado: 'Fernando Diaz', telefono: '984123462' },
+        { nombres: 'Isabella', apellidos: 'Gutierrez Vega', grado: '3ro', seccion: 'B', apoderado: 'Roberto Gutierrez', telefono: '984123463' },
+        { nombres: 'Diego', apellidos: 'Morales Cruz', grado: '5to', seccion: 'A', apoderado: 'Antonio Morales', telefono: '984123464' },
+        { nombres: 'Valentina', apellidos: 'Soto Ramos', grado: '5to', seccion: 'A', apoderado: 'Miguel Soto', telefono: '984123465' },
+        { nombres: 'Santiago', apellidos: 'Ramirez Vargas', grado: '5to', seccion: 'B', apoderado: 'Luis Ramirez', telefono: '984123466' },
+        { nombres: 'Camila', apellidos: 'Jimenez Flores', grado: '5to', seccion: 'B', apoderado: 'Oscar Jimenez', telefono: '984123467' },
+        { nombres: 'Andres', apellidos: 'Guerrero Peña', grado: '4to', seccion: 'A', apoderado: 'Raul Guerrero', telefono: '984123468' },
+        { nombres: 'Paula', apellidos: 'Castro Medina', grado: '4to', seccion: 'A', apoderado: 'Gabriel Castro', telefono: '984123469' },
+        { nombres: 'Felipe', apellidos: 'Navarro Rojas', grado: '4to', seccion: 'B', apoderado: 'Hector Navarro', telefono: '984123470' },
+        { nombres: 'Martina', apellidos: 'Ávila Munoz', grado: '4to', seccion: 'B', apoderado: 'Ivan Ávila', telefono: '984123471' },
+        { nombres: 'Javier', apellidos: 'Delgado Ortiz', grado: '3ro', seccion: 'A', apoderado: 'Sergio Delgado', telefono: '984123472' },
+        { nombres: 'Gabriela', apellidos: 'Romero Silva', grado: '3ro', seccion: 'A', apoderado: 'Vicente Romero', telefono: '984123473' },
+        { nombres: 'Roberto', apellidos: 'Espinoza Bravo', grado: '3ro', seccion: 'B', apoderado: 'Enrique Espinoza', telefono: '984123474' },
+        { nombres: 'Natalia', apellidos: 'Campos Acosta', grado: '3ro', seccion: 'B', apoderado: 'Manuel Campos', telefono: '984123475' }
+      ];
 
-  private async crearEstudiantes(): Promise<string[]> {
-    const estudiantesData = [
-      // 1ro Secundaria
-      { nombres: 'Lucas', apellidos: 'Mendez Ramos', apoderado: 'Jorge Mendez Ruiz', grado: '1ro', seccion: 'A' },
-      { nombres: 'Carla', apellidos: 'Flores Lopez', apoderado: 'Maria Lopez Sanchez', grado: '1ro', seccion: 'B' },
-      // 2do Secundaria
-      { nombres: 'Adrian', apellidos: 'Torres Gutierrez', apoderado: 'Carlos Torres Rodriguez', grado: '2do', seccion: 'A' },
-      { nombres: 'Sophia', apellidos: 'Garcia Martinez', apoderado: 'Diana Martinez Perez', grado: '2do', seccion: 'A' },
-      { nombres: 'Miguel', apellidos: 'Quispe Huaman', apoderado: 'Juan Quispe Flores', grado: '2do', seccion: 'B' }
-    ];
+      const estudiantesIds: string[] = [];
+      let estudianteIndex = 1;
 
-    const estudiantesIds: string[] = [];
-    let estudiantesCreados = 0;
+      for (const estData of estudiantesData) {
+        try {
+          const email = `${estData.nombres.toLowerCase()}.${estData.apellidos.split(' ')[0].toLowerCase()}@cole.pe`;
+          let uid = '';
 
-    for (const estData of estudiantesData) {
-      const email = `${estData.nombres.toLowerCase()}.${estData.apellidos.split(' ')[0].toLowerCase()}@cole.pe`;
-
-      try {
-        const userCred = await createUserWithEmailAndPassword(this.auth, email, 'Estudiante123!');
-        const uid = userCred.user.uid;
-
-        // Guardar en usuarios
-        await setDoc(doc(this.firestore, 'usuarios', uid), {
-          nombre: estData.nombres,
-          apellido: estData.apellidos,
-          email: email,
-          rol: 'estudiante',
-          uid: uid,
-          fechaCreacion: new Date()
-        });
-
-        // Guardar en estudiantes
-        const estRef = await addDoc(collection(this.firestore, 'estudiantes'), {
-          nombres: estData.nombres,
-          apellidos: estData.apellidos,
-          nivel: 'Secundaria',
-          grado: estData.grado,
-          seccion: estData.seccion,
-          fechaNacimiento: new Date(2007 + (estData.grado === '1ro' ? 0 : 1), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
-          nombreApoderado: estData.apoderado,
-          telefonoApoderado: '987654321',
-          emailInstitucional: email,
-          estado: 'activo',
-          uid: uid
-        });
-
-        estudiantesIds.push(estRef.id);
-        estudiantesCreados++;
-        console.log(`✅ Estudiante creado: ${estData.nombres} ${estData.apellidos} (${estData.grado}/${estData.seccion}) -> Apoderado: ${estData.apoderado}`);
-      } catch (error: any) {
-        if (error.code === 'auth/email-already-in-use') {
-          // Si ya existe, obtener el ID del documento
-          const estSnap = await getDocs(collection(this.firestore, 'estudiantes'));
-          const estExistente = estSnap.docs.find(d => d.data()['emailInstitucional'] === email);
-          if (estExistente) {
-            estudiantesIds.push(estExistente.id);
-            console.log(`ℹ️ Estudiante ya existe: ${estData.nombres} ${estData.apellidos}`);
+          try {
+            const estAuth = await createUserWithEmailAndPassword(this.auth, email, 'Estudiante123!');
+            uid = estAuth.user.uid;
+          } catch (error: any) {
+            if (error.code === 'auth/email-already-in-use') {
+              console.log(`ℹ️ Estudiante ${email} ya existe en Auth`);
+              // Obtener el UID real del documento existente
+              const estDoc = await getDocs(query(collection(this.firestore, 'usuarios'), where('email', '==', email)));
+              if (estDoc.docs.length > 0) {
+                uid = estDoc.docs[0].data()['uid'];
+                console.log(`✅ UID estudiante encontrado: ${uid}`);
+              }
+            }
           }
-        } else {
-          console.error(`Error creando estudiante ${email}:`, error);
+
+          // Guardar en usuarios
+          await setDoc(doc(this.firestore, 'usuarios', uid), {
+            nombre: estData.nombres,
+            apellido: estData.apellidos,
+            email: email,
+            rol: 'estudiante',
+            uid: uid,
+            fechaCreacion: new Date()
+          });
+
+          // Guardar en estudiantes
+          const estRef = await addDoc(collection(this.firestore, 'estudiantes'), {
+            nombres: estData.nombres,
+            apellidos: estData.apellidos,
+            nivel: 'Secundaria',
+            grado: estData.grado,
+            seccion: estData.seccion,
+            fechaNacimiento: new Date(2008 + Math.floor(Math.random() * 2), Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1),
+            nombreApoderado: estData.apoderado,
+            telefonoApoderado: estData.telefono,
+            emailInstitucional: email,
+            estado: 'activo',
+            uid: uid
+          });
+
+          estudiantesIds.push(estRef.id);
+          console.log(`✅ Estudiante ${estudianteIndex}/20: ${estData.nombres} ${estData.apellidos}`);
+          estudianteIndex++;
+        } catch (error) {
+          console.error(`❌ Error estudiante:`, error);
         }
       }
-    }
+      console.log(`✅ Total estudiantes: ${estudiantesIds.length}/20`);
 
-    console.log(`✅ Total estudiantes: ${estudiantesCreados}`);
-    return estudiantesIds;
-  }
+      // 5. CREAR MATRÍCULAS
+      console.log('5️⃣ Creando Matrículas...');
+      const estudiantesSnap = await getDocs(collection(this.firestore, 'estudiantes'));
+      const cursosSnap = await getDocs(collection(this.firestore, 'cursos'));
 
-  private async crearMatriculas(estudiantesIds: string[], cursosIds: string[]): Promise<void> {
-    let matriculasCreadas = 0;
+      const estudiantesMap: { [key: string]: any } = {};
+      const cursosMap: { [key: string]: any } = {};
 
-    // Obtener datos de estudiantes y cursos para validar coincidencias
-    const estudiantesSnap = await getDocs(collection(this.firestore, 'estudiantes'));
-    const cursosSnap = await getDocs(collection(this.firestore, 'cursos'));
-
-    const estudiantesMap: { [key: string]: any } = {};
-    const cursosMap: { [key: string]: any } = {};
-
-    estudiantesSnap.forEach(doc => {
-      estudiantesMap[doc.id] = doc.data();
-    });
-
-    cursosSnap.forEach(doc => {
-      cursosMap[doc.id] = doc.data();
-    });
-
-    for (const estudianteId of estudiantesIds) {
-      const estudiante = estudiantesMap[estudianteId];
-      if (!estudiante) continue;
-
-      // Obtener cursos compatibles con el grado del estudiante
-      const cursosCompatibles = cursosIds.filter(cursoId => {
-        const curso = cursosMap[cursoId];
-        return curso && curso.grado === estudiante.grado;
+      estudiantesSnap.forEach(docSnap => {
+        estudiantesMap[docSnap.id] = docSnap.data();
       });
 
-      if (cursosCompatibles.length === 0) continue;
+      cursosSnap.forEach(docSnap => {
+        cursosMap[docSnap.id] = docSnap.data();
+      });
 
-      // Asignar 2-3 cursos aleatorios de los compatibles
-      const numCursos = Math.min(Math.floor(Math.random() * 2) + 2, cursosCompatibles.length);
-      const cursosAsignados = new Set<number>();
+      let matriculasCreadas = 0;
 
-      while (cursosAsignados.size < numCursos) {
-        cursosAsignados.add(Math.floor(Math.random() * cursosCompatibles.length));
-      }
+      for (const estudianteId of estudiantesIds) {
+        const estudiante = estudiantesMap[estudianteId];
+        if (!estudiante) continue;
 
-      for (const cursoIndex of cursosAsignados) {
-        try {
-          const cursoId = cursosCompatibles[cursoIndex];
-          await addDoc(collection(this.firestore, 'matriculas'), {
-            estudianteId: estudianteId,
-            cursoId: cursoId,
-            estado: 'activa',
-            fechaInscripcion: new Date(),
-            calificacionFinal: null
-          });
-          matriculasCreadas++;
-          console.log(`✅ Matrícula creada: Est ${estudiante.nombres} -> Curso ${cursosMap[cursoId].nombre}`);
-        } catch (error) {
-          console.error('Error creando matrícula:', error);
+        // Encontrar cursos del mismo grado
+        const cursosPorGrado = Object.keys(cursosMap).filter(cursoId => {
+          const curso = cursosMap[cursoId];
+          return curso && curso.grado === estudiante.grado;
+        });
+
+        // Matricular en 2-3 cursos del mismo grado
+        const numCursos = Math.min(Math.floor(Math.random() * 2) + 2, cursosPorGrado.length);
+        const cursosAMatricular = cursosPorGrado.sort(() => Math.random() - 0.5).slice(0, numCursos);
+
+        for (const cursoId of cursosAMatricular) {
+          try {
+            await addDoc(collection(this.firestore, 'matriculas'), {
+              estudianteId: estudianteId,
+              cursoId: cursoId,
+              estado: 'activa',
+              fechaInscripcion: new Date(),
+              calificacionFinal: null
+            });
+            matriculasCreadas++;
+          } catch (error) {
+            console.error('Error creando matrícula:', error);
+          }
         }
       }
+
+      console.log(`✅ Total matrículas: ${matriculasCreadas}`);
+
+      console.log('');
+      console.log('═══════════════════════════════════════════════════════');
+      console.log('✅✅✅ ¡BASE DE DATOS INSERTADA CORRECTAMENTE! ✅✅✅');
+      console.log('═══════════════════════════════════════════════════════');
+      console.log('📊 RESUMEN:');
+      console.log('   ✅ 1 Admin (admin@cole.pe / Admin123!)');
+      console.log('   ✅ 5 Docentes (Docente123!)');
+      console.log('   ✅ 5 Cursos');
+      console.log('   ✅ 20 Estudiantes (Estudiante123!)');
+      console.log(`   ✅ ${matriculasCreadas} Matrículas`);
+      console.log('═══════════════════════════════════════════════════════');
+      console.log('');
+    } catch (error) {
+      console.error('❌ Error crítico:', error);
+      throw error;
     }
-
-    console.log(`✅ Total matrículas: ${matriculasCreadas}`);
-  }
-
-  private getGradosAsignados(asignatura: string): string[] {
-    const asignacionGrados: { [key: string]: string[] } = {
-      'Matematica': ['1ro', '2do', '3ro', '4to', '5to'],
-      'Comunicacion': ['1ro', '2do', '3ro', '4to', '5to'],
-      'Ciencia y Ambiente': ['1ro', '2do', '3ro', '4to', '5to'],
-      'Historia': ['1ro', '2do', '3ro', '4to', '5to'],
-      'Ingles': ['1ro', '2do', '3ro', '4to', '5to'],
-      'Natacion': ['1ro', '2do'],
-      'Aritmetica': ['1ro', '2do', '3ro'],
-      'Personal Social': ['2do', '3ro', '4to'],
-      'Geografia': ['2do', '3ro', '4to', '5to']
-    };
-
-    return asignacionGrados[asignatura] || ['1ro', '2do', '3ro', '4to', '5to'];
   }
 }
