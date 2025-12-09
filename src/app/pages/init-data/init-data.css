@@ -26,12 +26,14 @@
 .init-header h1 {
   font-size: 2rem;
   margin: 0 0 10px 0;
+  font-weight: 700;
 }
 
 .init-header p {
   font-size: 1.1rem;
   margin: 0;
-  opacity: 0.9;
+  opacity: 1;
+  font-weight: 500;
 }
 
 .init-content {
@@ -44,14 +46,15 @@
 
 .init-message p {
   font-size: 1rem;
-  color: #666;
+  color: #555;
   margin: 0 0 20px 0;
   line-height: 1.6;
+  font-weight: 500;
 }
 
 .small-text {
   font-size: 0.9rem;
-  color: #999;
+  color: #666;
   margin-bottom: 20px !important;
 }
 
@@ -65,8 +68,9 @@
 
 .init-message li {
   padding: 8px 0;
-  color: #555;
+  color: #333;
   font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .loading-state {
@@ -92,8 +96,9 @@
 
 .loading-state p {
   font-size: 1rem;
-  color: #666;
+  color: #555;
   margin: 15px 0;
+  font-weight: 500;
 }
 
 .success-state {
@@ -109,12 +114,14 @@
   color: #28a745;
   font-size: 1.8rem;
   margin: 0 0 10px 0;
+  font-weight: 700;
 }
 
 .success-state > p {
-  color: #666;
+  color: #555;
   font-size: 1rem;
   margin-bottom: 30px;
+  font-weight: 500;
 }
 
 .credentials {
@@ -126,10 +133,11 @@
 }
 
 .credentials h3 {
-  color: #333;
+  color: #222;
   margin: 0 0 20px 0;
   text-align: center;
   font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .credential-box {
@@ -139,6 +147,8 @@
   margin-bottom: 15px;
   border-radius: 4px;
   font-size: 0.95rem;
+  color: #333;
+  font-weight: 600;
 }
 
 .credential-box.admin {

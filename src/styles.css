@@ -10,13 +10,15 @@ html, body {
   height: 100%;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #333;
-  background: #f5f5f5;
+  background: #f8f9fa;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background: #f5f5f5;
+  background: #f8f9fa;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 app-root {
@@ -46,13 +48,15 @@ app-root {
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
-  color: #333;
+  color: #222;
   margin: 0;
+  font-weight: 700;
 }
 
 p {
   margin: 0;
-  color: #666;
+  color: #555;
+  font-size: 14px;
 }
 
 /* Buttons */
@@ -61,6 +65,7 @@ button {
   cursor: pointer;
   border: none;
   outline: none;
+  font-weight: 600;
 }
 
 button:hover {
@@ -70,16 +75,26 @@ button:hover {
 /* Links */
 a {
   text-decoration: none;
-  color: inherit;
+  color: #667eea;
+  font-weight: 600;
+}
+
+a:hover {
+  color: #764ba2;
 }
 
 /* Inputs */
 input, select, textarea {
   font-family: inherit;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 14px;
+  color: #333;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #999;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -98,11 +113,14 @@ th, td {
   text-align: left;
   padding: 12px;
   border-bottom: 1px solid #ddd;
+  color: #333;
+  font-weight: 500;
 }
 
 th {
   background: #f8f9fa;
-  font-weight: bold;
+  font-weight: 700;
+  color: #222;
 }
 
 tr:hover {
@@ -155,7 +173,7 @@ tr:hover {
 .font-bold { font-weight: bold; }
 .font-light { font-weight: 300; }
 
-.text-muted { color: #999; }
+.text-muted { color: #666; }
 .text-success { color: #28a745; }
 .text-danger { color: #dc3545; }
 .text-warning { color: #ffc107; }

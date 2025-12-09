@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .panel-header {
@@ -16,12 +18,14 @@
 .panel-header h1 {
   margin: 0 0 10px 0;
   font-size: 28px;
+  font-weight: 700;
 }
 
 .panel-header p {
   margin: 0;
   font-size: 16px;
-  opacity: 0.9;
+  opacity: 1;
+  font-weight: 500;
 }
 
 .content {
@@ -42,8 +46,9 @@
 .estudiantes-section h2 {
   margin-top: 0;
   margin-bottom: 20px;
-  color: #333;
+  color: #222;
   font-size: 20px;
+  font-weight: 700;
 }
 
 .curso-selector {
@@ -54,10 +59,12 @@
   width: 100%;
   max-width: 400px;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
+  color: #333;
+  font-weight: 600;
 }
 
 .select-course:focus {
@@ -87,7 +94,7 @@
 }
 
 .info-item label {
-  font-weight: 600;
+  font-weight: 700;
   color: #667eea;
   font-size: 12px;
   text-transform: uppercase;
@@ -99,19 +106,16 @@
   margin: 0;
   color: #333;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .curso-descripcion {
-  color: #666;
+  color: #555;
   font-size: 14px;
   line-height: 1.5;
   margin: 15px 0 0 0;
   padding-top: 15px;
   border-top: 1px solid #ddd;
-}
-
-.estudiantes-section {
-  margin-top: 20px;
 }
 
 .search-bar {
@@ -122,9 +126,14 @@
   width: 100%;
   max-width: 300px;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  color: #333;
+}
+
+.search-input::placeholder {
+  color: #999;
 }
 
 .search-input:focus {
@@ -140,15 +149,16 @@
 }
 
 .estudiantes-table thead {
-  background: #f8f9fa;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
   border-bottom: 2px solid #ddd;
 }
 
 .estudiantes-table th {
   padding: 12px;
   text-align: left;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: white;
   font-size: 14px;
 }
 
@@ -164,7 +174,8 @@
 .estudiantes-table td {
   padding: 12px;
   font-size: 14px;
-  color: #666;
+  color: #333;
+  font-weight: 500;
 }
 
 .estado-badge {
@@ -172,7 +183,7 @@
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .estado-activa {
@@ -193,7 +204,7 @@
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #999;
+  color: #666;
 }
 
 .empty-state p {
@@ -209,6 +220,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  font-weight: 600;
 }
 
 .alert-info {

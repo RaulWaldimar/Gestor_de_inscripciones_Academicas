@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .header {
@@ -10,8 +12,9 @@
 
 .header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #222;
   margin: 0;
+  font-weight: 700;
 }
 
 .content {
@@ -71,13 +74,24 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 5px 0;
-  opacity: 0.8;
+  opacity: 1;
+  font-weight: 600;
+  color: #666;
+}
+
+.stat-card.total .stat-label {
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
+  color: #333;
+}
+
+.stat-card.total .stat-value {
+  color: white;
 }
 
 /* Ocupación */
@@ -91,8 +105,9 @@
 
 .ocupacion-section h2 {
   margin-top: 0;
-  color: #333;
+  color: #222;
   margin-bottom: 20px;
+  font-weight: 700;
 }
 
 .ocupacion-container {
@@ -117,9 +132,10 @@
 
 .ocupacion-text {
   font-size: 1.1rem;
-  color: #666;
+  color: #555;
   margin: 0;
   text-align: center;
+  font-weight: 600;
 }
 
 /* Cursos Matrículas */
@@ -132,14 +148,15 @@
 
 .cursos-matriculas-section h2 {
   margin-top: 0;
-  color: #333;
+  color: #222;
   margin-bottom: 20px;
+  font-weight: 700;
 }
 
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #999;
+  color: #666;
   font-size: 1rem;
 }
 
@@ -156,12 +173,15 @@
 .matriculas-table th {
   padding: 15px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .matriculas-table td {
   padding: 12px 15px;
   border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  font-size: 14px;
 }
 
 .matriculas-table tbody tr:hover {
@@ -174,7 +194,7 @@
   color: white;
   padding: 5px 12px;
   border-radius: 20px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.875rem;
 }
 

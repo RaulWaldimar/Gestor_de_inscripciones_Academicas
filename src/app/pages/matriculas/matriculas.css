@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .header {
@@ -9,12 +11,15 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .header h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: #222;
   margin: 0;
+  font-weight: 700;
 }
 
 /* Form Modal */
@@ -59,8 +64,10 @@
 
 .form-card h2 {
   margin-top: 0;
-  color: #333;
+  color: #222;
   margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .form-group {
@@ -70,19 +77,25 @@
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 600;
+  font-weight: 700;
   color: #333;
+  font-size: 14px;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
   padding: 10px 12px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
   font-family: inherit;
   transition: border-color 0.3s;
+  color: #333;
+}
+
+.form-group input::placeholder {
+  color: #999;
 }
 
 .form-group input:focus,
@@ -97,6 +110,7 @@
   color: #dc3545;
   font-size: 0.875rem;
   margin-top: 5px;
+  font-weight: 600;
 }
 
 .form-actions {
@@ -121,10 +135,15 @@
   flex: 1;
   min-width: 200px;
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  color: #333;
+}
+
+.search-input::placeholder {
+  color: #999;
 }
 
 .search-input:focus {
@@ -135,12 +154,14 @@
 
 .filter-select {
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
+  border: 2px solid #ddd;
   border-radius: 6px;
   font-size: 1rem;
   background: white;
   cursor: pointer;
   transition: border-color 0.3s;
+  color: #333;
+  font-weight: 600;
 }
 
 .filter-select:focus {
@@ -166,8 +187,10 @@
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #999;
+  color: #666;
   font-size: 1.1rem;
+  background: white;
+  border-radius: 8px;
 }
 
 .matriculas-table {
@@ -187,12 +210,15 @@
 .matriculas-table th {
   padding: 15px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .matriculas-table td {
   padding: 12px 15px;
   border-bottom: 1px solid #f0f0f0;
+  color: #333;
+  font-size: 14px;
 }
 
 .matriculas-table tbody tr:hover {
@@ -204,7 +230,7 @@
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -233,7 +259,7 @@
 }
 
 .text-muted {
-  color: #999;
+  color: #666;
 }
 
 .btn {
@@ -241,7 +267,7 @@
   border: none;
   border-radius: 4px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;

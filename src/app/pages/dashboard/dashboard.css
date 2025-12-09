@@ -2,6 +2,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .dashboard-header {
@@ -16,12 +18,14 @@
 .dashboard-header h1 {
   margin: 0;
   font-size: 32px;
+  font-weight: 700;
 }
 
 .dashboard-header p {
   margin: 10px 0 0 0;
   font-size: 16px;
-  opacity: 0.9;
+  opacity: 1;
+  font-weight: 500;
 }
 
 .alert {
@@ -29,6 +33,7 @@
   border-radius: 5px;
   margin-bottom: 20px;
   font-size: 14px;
+  font-weight: 600;
 }
 
 .alert-info {
@@ -77,8 +82,9 @@
 
 .info-section h2 {
   margin: 0 0 20px 0;
-  color: #333;
+  color: #222;
   font-size: 20px;
+  font-weight: 700;
 }
 
 .info-grid {
@@ -96,8 +102,8 @@
 
 .info-item label {
   display: block;
-  color: #666;
-  font-weight: bold;
+  color: #555;
+  font-weight: 700;
   font-size: 12px;
   margin-bottom: 5px;
   text-transform: uppercase;
@@ -107,6 +113,7 @@
   margin: 0;
   color: #333;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .cursos-section {
@@ -127,17 +134,23 @@
 
 .section-header h2 {
   margin: 0;
-  color: #333;
+  color: #222;
   font-size: 20px;
+  font-weight: 700;
 }
 
 .search-input {
   padding: 10px 15px;
-  border: 1px solid #ddd;
+  border: 2px solid #ddd;
   border-radius: 5px;
   font-size: 14px;
   flex: 1;
   min-width: 250px;
+  color: #333;
+}
+
+.search-input::placeholder {
+  color: #999;
 }
 
 .search-input:focus {
@@ -149,7 +162,7 @@
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #999;
+  color: #666;
   font-size: 16px;
 }
 
@@ -164,7 +177,7 @@
   border-radius: 8px;
   overflow: hidden;
   transition: all 0.3s ease;
-  background: #f8f9fa;
+  background: white;
 }
 
 .curso-card:hover {
@@ -186,13 +199,14 @@
   margin: 0;
   font-size: 16px;
   flex: 1;
+  font-weight: 700;
 }
 
 .estado-badge {
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -218,11 +232,12 @@
 .curso-info p {
   margin: 10px 0;
   font-size: 14px;
-  color: #666;
+  color: #555;
 }
 
 .curso-info p strong {
-  color: #333;
+  color: #222;
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {

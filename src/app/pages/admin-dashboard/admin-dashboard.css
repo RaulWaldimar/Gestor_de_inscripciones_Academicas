@@ -2,6 +2,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
 }
 
 .dashboard-header {
@@ -17,12 +19,14 @@
   margin: 0 0 10px 0;
   font-size: 32px;
   font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .dashboard-header p {
   margin: 0;
   font-size: 16px;
-  opacity: 0.9;
+  opacity: 1;
+  font-weight: 500;
 }
 
 .stats-grid {
@@ -57,6 +61,7 @@
   font-weight: 700;
   color: #667eea;
   margin-bottom: 10px;
+  line-height: 1;
 }
 
 .stat-card.highlight .stat-number {
@@ -65,10 +70,10 @@
 
 .stat-label {
   font-size: 14px;
-  color: #666;
+  color: #555;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 15px;
 }
 
@@ -100,8 +105,9 @@
 .quick-actions h2 {
   margin-top: 0;
   margin-bottom: 25px;
-  color: #333;
+  color: #222;
   font-size: 22px;
+  font-weight: 700;
 }
 
 .action-buttons {
