@@ -111,7 +111,7 @@
                   {{ matricula.estado | estadoMatricula }}
                 </span>
               </td>
-              <td>{{ matricula.fechaInscripcion | date: 'short' }}</td>
+              <td>{{ matricula.fechaInscripcion | safeDate }}</td>
               <td>{{ matricula.calificacionFinal || 'Sin calificar' }}</td>
             </tr>
           </tbody>

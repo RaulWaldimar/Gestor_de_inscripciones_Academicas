@@ -8,11 +8,12 @@ import { MatriculaService } from '../../services/matricula.service';
 import { EstudianteService } from '../../services/estudiante.service';
 import { Curso, Matricula, Usuario, Docente, Estudiante } from '../../models';
 import { EstadoMatriculaPipe } from '../../pipes/custom.pipes';
+import { SafeDatePipe } from '../../pipes/timestamp.pipe';
 
 @Component({
   selector: 'app-docente-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, EstadoMatriculaPipe],
+  imports: [CommonModule, FormsModule, EstadoMatriculaPipe, SafeDatePipe],
   templateUrl: './docente-panel.html',
   styleUrls: ['./docente-panel.css']
 })
