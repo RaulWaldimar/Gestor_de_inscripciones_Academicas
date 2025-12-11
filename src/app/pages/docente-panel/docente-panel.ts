@@ -93,9 +93,18 @@ export class DocentePanelComponent implements OnInit {
   cargarMatriculas(): void {
     if (!this.selectedCursoId) return;
 
+    console.log('📋 Cargando matrículas para curso:', this.selectedCursoId);
+    
     this.matriculaService.obtenerMatriculasPorCurso(this.selectedCursoId).subscribe({
       next: (matriculas) => {
+        console.log('📊 Matrículas obtenidas:', matriculas.length);
+        console.log('   Todas las matrículas:', matriculas);
+        
         this.matriculas = matriculas.filter(m => m.estado === 'activa');
+        
+        console.log('✅ Matrículas activas:', this.matriculas.length);
+        console.log('   Matrículas filtradas:', this.matriculas);
+        
         // Cargar información de los estudiantes
         this.cargarEstudiantes();
       },

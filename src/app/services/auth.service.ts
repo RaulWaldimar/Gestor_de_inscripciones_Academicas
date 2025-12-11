@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from '@angular/fire/auth';
 import { Firestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, where, getDocs, setDoc } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable, from } from 'rxjs';
@@ -11,29 +11,30 @@ import { Usuario } from '../models';
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<Usuario | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private authInitializedSubject = new BehaviorSubject<boolean>(false);
+  public authInitialized$ = this.authInitializedSubject.asObservable();
 
-  constructor(private auth: Auth, private firestore: Firestore) {
+  private auth = inject(Auth);
+  private firestore = inject(Firestore);
+
+  constructor() {
     this.initAuthStateListener();
-    // Limpiar sesión si no hay usuario autenticado
-    this.verificarSesionActiva();
-  }
-
-  private verificarSesionActiva(): void {
-    // Si no hay usuario autenticado en Firebase, asegurar que se limpia el estado
-    if (!this.auth.currentUser) {
-      this.currentUserSubject.next(null);
-    }
   }
 
   private initAuthStateListener(): void {
     onAuthStateChanged(this.auth, async (user) => {
+      console.log('Auth state changed:', user ? `User: ${user.uid}` : 'No user');
+      
       if (user) {
         try {
           const userDoc = await getDoc(doc(this.firestore, 'usuarios', user.uid));
           if (userDoc.exists()) {
-            this.currentUserSubject.next(userDoc.data() as Usuario);
+            const userData = userDoc.data() as Usuario;
+            console.log('User document found:', userData.nombre);
+            this.currentUserSubject.next(userData);
           } else {
             // Usuario en Firebase pero no en Firestore
+            console.warn('User not found in Firestore');
             this.currentUserSubject.next(null);
             await signOut(this.auth);
           }
@@ -42,8 +43,13 @@ export class AuthService {
           this.currentUserSubject.next(null);
         }
       } else {
+        console.log('No authenticated user');
         this.currentUserSubject.next(null);
       }
+      
+      // Marcar que la autenticación ha sido inicializada
+      console.log('Auth initialized');
+      this.authInitializedSubject.next(true);
     });
   }
 
