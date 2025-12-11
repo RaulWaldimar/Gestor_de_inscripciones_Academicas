@@ -14,14 +14,32 @@ export class AuthService {
 
   constructor(private auth: Auth, private firestore: Firestore) {
     this.initAuthStateListener();
+    // Limpiar sesión si no hay usuario autenticado
+    this.verificarSesionActiva();
+  }
+
+  private verificarSesionActiva(): void {
+    // Si no hay usuario autenticado en Firebase, asegurar que se limpia el estado
+    if (!this.auth.currentUser) {
+      this.currentUserSubject.next(null);
+    }
   }
 
   private initAuthStateListener(): void {
     onAuthStateChanged(this.auth, async (user) => {
       if (user) {
-        const userDoc = await getDoc(doc(this.firestore, 'usuarios', user.uid));
-        if (userDoc.exists()) {
-          this.currentUserSubject.next(userDoc.data() as Usuario);
+        try {
+          const userDoc = await getDoc(doc(this.firestore, 'usuarios', user.uid));
+          if (userDoc.exists()) {
+            this.currentUserSubject.next(userDoc.data() as Usuario);
+          } else {
+            // Usuario en Firebase pero no en Firestore
+            this.currentUserSubject.next(null);
+            await signOut(this.auth);
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          this.currentUserSubject.next(null);
         }
       } else {
         this.currentUserSubject.next(null);

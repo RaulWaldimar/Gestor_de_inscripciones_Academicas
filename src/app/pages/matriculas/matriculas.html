@@ -128,7 +128,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let matricula of matriculasFiltradas">
+          <tr *ngFor="let matricula of matriculasPaginadas">
             <td>{{ (matricula.nombreEstudiante || obtenerNombreEstudiante(matricula.estudianteId)) | titlecase }}</td>
             <td>
               <span class="grado-badge">{{ obtenerGradoEstudiante(matricula.estudianteId) }}</span>
@@ -229,7 +229,7 @@
     </div>
 
     <!-- Paginación -->
-    <div *ngIf="totalPaginas > 1" class="pagination">
+    <div *ngIf="totalPaginas > 1 && vistaActual === 'general'" class="pagination">
       <button class="btn btn-sm" (click)="paginaAnterior()" [disabled]="paginaActual === 1">
         ← Anterior
       </button>

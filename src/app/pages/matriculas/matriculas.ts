@@ -32,13 +32,15 @@ export class MatriculasComponent implements OnInit {
   showForm = false;
   buscador = '';
   filtroEstado = '';
+  private buscadorAnterior = '';
+  private filtroEstadoAnterior = '';
   
   // Vista
   vistaActual: 'general' | 'grados' = 'general';
   
   // Paginación
   paginaActual = 1;
-  registrosPorPagina = 5;
+  registrosPorPagina = 10;
 
   matriculaForm!: FormGroup;
 
@@ -251,13 +253,22 @@ export class MatriculasComponent implements OnInit {
   }
 
   get matriculasFiltradas(): MatriculaConDatos[] {
-    return this.matriculas.filter(m => {
+    const resultado = this.matriculas.filter(m => {
       const coincideEstado = this.filtroEstado === '' || m.estado === this.filtroEstado;
       const coincideBusqueda = this.buscador === '' ||
         (m.nombreEstudiante?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false) ||
         (m.nombreCurso?.toLowerCase().includes(this.buscador.toLowerCase()) ?? false);
       return coincideEstado && coincideBusqueda;
     });
+    
+    // Resetear a página 1 solo cuando hay cambios en filtros (no en cada acceso)
+    if (this.buscadorAnterior !== this.buscador || this.filtroEstadoAnterior !== this.filtroEstado) {
+      this.paginaActual = 1;
+      this.buscadorAnterior = this.buscador;
+      this.filtroEstadoAnterior = this.filtroEstado;
+    }
+    
+    return resultado;
   }
 
   get gradosUnicos(): string[] {

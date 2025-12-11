@@ -23,6 +23,10 @@ export class App implements OnInit {
   ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
+      // Limpiar menú cuando no hay usuario
+      if (!user) {
+        this.menuAbierto = false;
+      }
     });
   }
 
