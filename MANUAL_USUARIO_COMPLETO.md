@@ -1,4 +1,4 @@
-# 📖 Manual de Usuario - Gestor de Inscripciones Académicas
+# Manual de Usuario - Gestor de Inscripciones Académicas
 
 ## Tabla de Contenidos
 1. [Inicio de Sesión](#inicio-de-sesión)
@@ -281,7 +281,7 @@ Muestra gráficos y análisis:
 
 ---
 
-## 🔧 Funciones Comunes
+## Funciones Comunes
 
 ### Búsqueda y Filtros
 
