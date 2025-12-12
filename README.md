@@ -1,59 +1,242 @@
-# GestorDeInscripcionesAcademicas
+# Gestor de Inscripciones Académicas
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.7.
+## 📋 Descripción del Proyecto
 
-## Development server
+Sistema web completo de gestión de inscripciones académicas desarrollado con **Angular 18** y **Firebase**. Permite a administradores, docentes y estudiantes gestionar cursos, matrículas, calificaciones y información académica de forma centralizada.
 
-To start a local development server, run:
+### Características Principales
+- **Autenticación y autorización** con roles específicos (Admin, Docente, Estudiante)
+- **Gestión completa CRUD** de estudiantes, docentes, cursos y matrículas
+- **Dashboard personalizado** para cada tipo de usuario
+- **Filtros y búsqueda** en tiempo real
+- **Paginación** de listados
+- **Base de datos en la nube** con Firestore
+- **Interfaz responsiva** y amigable con el usuario
 
+---
+
+## 🛠️ Tecnologías y Herramientas
+
+### Frontend
+- **Angular 18** - Framework principal
+- **Angular Standalone Components** - Arquitectura modular
+- **TypeScript** - Lenguaje de programación
+- **CSS3** - Estilos personalizados con gradientes y animaciones
+- **Reactive Forms** - Formularios con validaciones
+
+### Backend y Base de Datos
+- **Firebase Authentication** - Gestión de usuarios y autenticación
+- **Firebase Firestore** - Base de datos NoSQL en la nube
+- **AngularFire** - Librería oficial para integración Firebase-Angular
+
+### Herramientas de Desarrollo
+- **Angular CLI** - Herramienta de línea de comandos
+- **TypeScript Compiler** - Compilación de TypeScript
+- **Git** - Control de versiones
+
+---
+
+## 📦 Requisitos para Instalar y Ejecutar
+
+### Requisitos Previos
+- **Node.js** 18.x o superior
+- **npm** 9.x o superior
+- **Git** (opcional, para clonar el repositorio)
+- Una cuenta en **Firebase**
+
+### Instalación Paso a Paso
+
+#### 1. Clonar el Repositorio
 ```bash
-ng serve
+git clone https://github.com/RaulWaldimar/Gestor_de_inscripciones_Academicas.git
+cd Gestor_de_inscripciones_Academicas
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+#### 2. Instalar Dependencias
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+#### 3. Configurar Firebase (Opcional - ya está configurado)
+Si necesitas cambiar la configuración de Firebase:
+- Abre `src/environments/environment.ts`
+- Reemplaza con tus credenciales de Firebase
 
+#### 4. Ejecutar en Desarrollo
 ```bash
-ng generate --help
+ng serve -o
+```
+La aplicación se abrirá automáticamente en `http://localhost:4200`
+
+#### 5. Compilar para Producción
+```bash
+ng build --configuration production
 ```
 
-## Building
+---
 
-To build the project run:
+## 🏗️ Arquitectura del Proyecto
 
-```bash
-ng build
+### Estructura de Carpetas
+```
+src/
+├── app/
+│   ├── pages/                    # Componentes de página
+│   │   ├── login/                # Página de inicio de sesión
+│   │   ├── dashboard/            # Panel estudiante
+│   │   ├── admin-dashboard/      # Panel administrador
+│   │   ├── docente-panel/        # Panel docente
+│   │   ├── admin/                # Rutas administrativas (lazy loading)
+│   │   │   ├── cursos/           # Gestión de cursos
+│   │   │   ├── estudiantes/      # Gestión de estudiantes
+│   │   │   ├── docentes/         # Gestión de docentes
+│   │   │   ├── matriculas/       # Gestión de matrículas
+│   │   │   └── estadisticas/     # Estadísticas
+│   │   └── init-data/            # Inicialización de datos
+│   │
+│   ├── services/                 # Servicios Angular
+│   │   ├── auth.service.ts       # Autenticación y autorización
+│   │   ├── estudiante.service.ts # Operaciones CRUD estudiantes
+│   │   ├── docente.service.ts    # Operaciones CRUD docentes
+│   │   ├── curso.service.ts      # Operaciones CRUD cursos
+│   │   ├── matricula.service.ts  # Operaciones CRUD matrículas
+│   │   └── estadisticas.service.ts
+│   │
+│   ├── guards/                   # Guards de rutas
+│   │   └── auth.guard.ts         # Protección de rutas
+│   │
+│   ├── pipes/                    # Pipes personalizados
+│   │   ├── custom.pipes.ts       # Pipe estadoMatricula
+│   │   └── timestamp.pipe.ts     # Pipe safeDate
+│   │
+│   ├── models/                   # Interfaces y tipos
+│   │   └── index.ts              # Definiciones de entidades
+│   │
+│   ├── app.routes.ts             # Configuración de rutas
+│   ├── app.ts                    # Componente raíz
+│   └── app.config.ts             # Configuración de la app
+│
+├── environments/                 # Configuración por ambiente
+│   ├── environment.ts            # Desarrollo
+│   └── environment.prod.ts       # Producción
+│
+└── index.html                    # Página HTML principal
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Componentes Principales
 
-## Running unit tests
+#### **AuthService**
+Gestiona autenticación, autorización y estados de usuario. Emite observables para que los componentes reaccionen a cambios de sesión.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+#### **CRUD Services**
+Cada entidad (Estudiante, Docente, Curso, Matrícula) tiene su servicio con métodos:
+- `obtener()` / `obtenerPorId()`
+- `crear()`
+- `actualizar()`
+- `eliminar()`
+
+#### **Guards**
+- `authGuard` - Requiere autenticación
+- `adminGuard` - Solo admin
+- `docenteGuard` - Solo docente
+- `estudianteGuard` - Solo estudiante
+
+#### **Pipes**
+- `EstadoMatriculaPipe` - Traduce estados (activa → Activa, etc.)
+- `SafeDatePipe` - Convierte timestamps de Firestore a fechas legibles
+
+### Flujo de Autenticación
+1. Usuario ingresa credenciales en login
+2. Firebase Authentication valida usuario
+3. AuthService obtiene datos desde Firestore
+4. CurrentUser$ Observable emite nuevo usuario
+5. Guards verifican permisos y autorizan acceso
+6. Dashboard se personaliza según rol
+
+---
+
+## 🔐 Seguridad
+
+- **Autenticación Firebase** - Contraseñas encriptadas
+- **Guards de ruta** - Solo usuarios autenticados acceden
+- **Roles y permisos** - Admin, Docente, Estudiante
+- **Solo admin crea usuarios** - Control centralizado
+- **Validación de formularios** - En cliente y servidor
+
+---
+
+## 📊 Entidades Principales
+
+### Usuario
+- `uid`, `email`, `nombre`, `apellido`, `rol`
+
+### Estudiante
+- `nombres`, `apellidos`, `emailInstitucional`, `grado`, `seccion`
+
+### Docente
+- `nombres`, `apellidos`, `especialidad`, `licencia`
+
+### Curso
+- `nombre`, `grado`, `seccion`, `docenteId`, `vacantes`
+
+### Matrícula
+- `estudianteId`, `cursoId`, `estado`, `fechaInscripción`, `calificación`
+
+---
+
+## 🚀 Despliegue en Firebase Hosting
 
 ```bash
-ng test
+# 1. Compilar para producción
+ng build --configuration production
+
+# 2. Instalar Firebase CLI
+npm install -g firebase-tools
+
+# 3. Iniciar sesión
+firebase login
+
+# 4. Desplegar
+firebase deploy
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 📝 Credenciales de Prueba
 
-```bash
-ng e2e
-```
+| Rol | Email | Contraseña |
+|-----|-------|-----------|
+| Admin | admin@cole.pe | Admin123! |
+| Estudiante | juan.quispe@cole.pe | Estudiante123! |
+| Docente | fabric@cole.pe | Docente123! |
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 👨‍💻 Autor
+
+**Raúl Waldimar**  
+[GitHub](https://github.com/RaulWaldimar)
+
+---
+
+## 📄 Licencia
+
+Este proyecto está disponible bajo licencia MIT.
+
+---
+
+## ✨ Características Futuras
+
+- [ ] Calificaciones por estudiante y materia
+- [ ] Generación de reportes PDF
+- [ ] Notificaciones por email
+- [ ] Panel de asistencia
+- [ ] Integración con calendario académico
+
+---
+
+## 🤝 Soporte
+
+Para reportar bugs o sugerencias, abra un issue en GitHub.
+
