@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, where, getDocs, setDoc } from '@angular/fire/firestore';
-import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { Observable, from, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { Estudiante } from '../models';
@@ -37,19 +37,16 @@ export class EstudianteService {
             }).then(() => {
               // Luego guardar en colección estudiantes
               return addDoc(this.estudiantesCollection, estudiante);
-            })
-          ).pipe(
-            map(docRef => docRef.id),
-            catchError(error => {
-              console.error('Error creando estudiante:', error);
-              throw error;
+            }).then((docRef) => {
+              // Hacer logout para que no quede logeado el estudiante nuevo
+              return signOut(this.auth).then(() => docRef.id);
             })
           );
         }),
         catchError(error => {
           if (error.code === 'auth/email-already-in-use') {
             console.warn(`Usuario ${estudiante.emailInstitucional} ya existe en Auth`);
-            // Si el usuario ya existe en Auth, intentar obtener su uid
+            // Si el usuario ya existe en Auth, solo guardar en Firestore
             return from(addDoc(this.estudiantesCollection, estudiante)).pipe(
               map(doc => doc.id)
             );

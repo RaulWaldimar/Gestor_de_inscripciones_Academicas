@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, where, getDocs, setDoc } from '@angular/fire/firestore';
-import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { Auth, createUserWithEmailAndPassword, signOut } from '@angular/fire/auth';
 import { Observable, from } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { Docente } from '../models';
@@ -37,12 +37,9 @@ export class DocenteService {
             }).then(() => {
               // Luego guardar en colección docentes
               return addDoc(this.docentesCollection, docente);
-            })
-          ).pipe(
-            map(docRef => docRef.id),
-            catchError(error => {
-              console.error('Error creando docente:', error);
-              throw error;
+            }).then((docRef) => {
+              // Hacer logout para que no quede logeado el docente nuevo
+              return signOut(this.auth).then(() => docRef.id);
             })
           );
         }),
