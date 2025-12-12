@@ -50,7 +50,7 @@ Si es tu primer acceso:
 
 ---
 
-## 📊 Panel de Estudiante
+## Panel de Estudiante
 
 ### Vista General
 
@@ -96,7 +96,7 @@ Visualiza:
 
 ---
 
-## 👨‍🏫 Panel de Docente
+## Panel de Docente
 
 ### Vista General
 
@@ -132,7 +132,7 @@ Para cada estudiante se muestra:
 
 ---
 
-## 🔐 Panel de Administrador
+## Panel de Administrador
 
 ### Vista General
 
@@ -324,7 +324,7 @@ Algunas acciones (eliminar, cancelar) piden confirmación:
 
 ---
 
-## ❓ Preguntas Frecuentes
+## Preguntas Frecuentes
 
 ### ¿Olvidé mi contraseña, qué hago?
 
@@ -378,7 +378,7 @@ La app dejará de sincronizar datos. Cuando recuperes conexión, volverá a func
 
 ---
 
-## 📞 Soporte
+## Soporte
 
 Si tienes problemas o preguntas no cubiertas aquí:
 
@@ -390,11 +390,11 @@ Si tienes problemas o preguntas no cubiertas aquí:
 
 ## 💡 Tips y Trucos
 
-- 🔍 Usa la búsqueda para encontrar rápidamente estudiantes o cursos
-- 📋 La vista "Por Grados" en matrículas es útil para revisiones rápidas
-- ⏱️ El sistema guarda automáticamente todos los cambios
-- 🔔 Revisa los mensajes de éxito/error para confirmar acciones
-- 📱 La app es responsiva, úsala desde tu celular si lo necesitas
+- Usa la búsqueda para encontrar rápidamente estudiantes o cursos
+- La vista "Por Grados" en matrículas es útil para revisiones rápidas
+- El sistema guarda automáticamente todos los cambios
+- Revisa los mensajes de éxito/error para confirmar acciones
+- La app es responsiva, úsala desde tu celular si lo necesitas
 
 ---
 
