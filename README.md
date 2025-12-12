@@ -207,7 +207,7 @@ firebase deploy
 | Rol | Email | Contraseña |
 |-----|-------|-----------|
 | Admin | admin@cole.pe | Admin123! |
-| Estudiante | juan.quispe@cole.pe | Estudiante123! |
+| Estudiante | ana.lopez@cole.pe | Estudiante123! |
 | Docente | fabric@cole.pe | Docente123! |
 
 ---
