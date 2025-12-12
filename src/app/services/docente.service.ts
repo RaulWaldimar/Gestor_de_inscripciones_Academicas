@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, doc, getDoc, updateDoc, deleteDoc, query, where, getDocs, setDoc } from '@angular/fire/firestore';
+import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
 import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap, catchError } from 'rxjs/operators';
 import { Docente } from '../models';
 
 @Injectable({
@@ -10,12 +11,55 @@ import { Docente } from '../models';
 export class DocenteService {
   private docentesCollection!: ReturnType<typeof collection>;
 
-  constructor(private firestore: Firestore) {
+  constructor(private firestore: Firestore, private auth: Auth) {
     this.docentesCollection = collection(this.firestore, 'docentes');
   }
 
   // CRUD Operations
   crearDocente(docente: Omit<Docente, 'id'>): Observable<string> {
+    // Si uid está vacío, crear usuario en Firebase Auth
+    if (!docente.uid) {
+      return from(
+        createUserWithEmailAndPassword(this.auth, docente.emailInstitucional, 'Docente123!')
+      ).pipe(
+        switchMap((userCred) => {
+          const uid = userCred.user.uid;
+          docente.uid = uid;
+          
+          // Guardar en colección usuarios
+          return from(
+            setDoc(doc(this.firestore, 'usuarios', uid), {
+              nombre: docente.nombres,
+              apellido: docente.apellidos,
+              email: docente.emailInstitucional,
+              rol: 'docente',
+              uid: uid
+            }).then(() => {
+              // Luego guardar en colección docentes
+              return addDoc(this.docentesCollection, docente);
+            })
+          ).pipe(
+            map(docRef => docRef.id),
+            catchError(error => {
+              console.error('Error creando docente:', error);
+              throw error;
+            })
+          );
+        }),
+        catchError(error => {
+          if (error.code === 'auth/email-already-in-use') {
+            console.warn(`Usuario ${docente.emailInstitucional} ya existe en Auth`);
+            // Si el usuario ya existe en Auth, solo guardar en Firestore
+            return from(addDoc(this.docentesCollection, docente)).pipe(
+              map(doc => doc.id)
+            );
+          }
+          throw error;
+        })
+      );
+    }
+    
+    // Si uid ya existe, solo guardar en Firestore
     return from(addDoc(this.docentesCollection, docente)).pipe(
       map(doc => doc.id)
     );

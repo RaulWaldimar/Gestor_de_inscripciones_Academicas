@@ -111,7 +111,7 @@ export class EstudiantesComponent implements OnInit {
         }
       });
     } else {
-      dataEstudiante.uid = '';
+      // Crear nuevo estudiante - el servicio creará la UID automáticamente
       this.estudianteService.crearEstudiante(dataEstudiante).subscribe({
         next: () => {
           this.cargarEstudiantes();
