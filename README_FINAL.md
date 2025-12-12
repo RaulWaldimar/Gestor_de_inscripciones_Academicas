@@ -212,12 +212,6 @@ firebase deploy
 
 ---
 
-## 📚 Documentación Adicional
-
-- **Manual de Usuario** - Ver `MANUAL_USUARIO.md`
-- **Cambios Recientes** - Ver `RESUMEN_CAMBIOS_CARGA_DATOS.md`
-
----
 
 ## 👨‍💻 Autor
 
