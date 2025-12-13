@@ -214,8 +214,8 @@ firebase deploy
 
 ## ENLACES DEL PROYECTO
 
-💠URL de firebase hosting: https://gestor-inscripciones-760ca.web.app/init
-💠URL del video del proyecto: https://drive.google.com/file/d/1lzCxYxQ0J425GTHJRn6yiRgtxI_kf5g-/view?usp=drive_link
+- URL de firebase hosting: https://gestor-inscripciones-760ca.web.app/init
+- URL del video del proyecto: https://drive.google.com/file/d/1lzCxYxQ0J425GTHJRn6yiRgtxI_kf5g-/view?usp=drive_link
 
 ---
 
